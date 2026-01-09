@@ -427,8 +427,6 @@ class CategoryChip extends StatelessWidget {
 
   static const Color _foreground = Color(0xFF0A0A0A);
   static const Color _card = Color(0xFFFFFFFF);
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _mutedForeground = Color(0xFF71717A);
   static const Color _border = Color(0xFFE4E4E7);
   static const Color _primary = Color(0xFF18181B);
 

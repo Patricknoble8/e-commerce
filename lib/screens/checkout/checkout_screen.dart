@@ -1364,15 +1364,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   text: _currentStep == 2
                       ? (_isProcessing ? 'Processing...' : 'Place Order')
                       : 'Next',
-                  onPressed: _currentStep == 2
-                      ? (_acceptTerms && !_isProcessing
-                          ? () {
-                              _processOrder();
-                            }
-                          : null)
-                      : () {
-                          setState(() => _currentStep++);
-                        },
+                  onPressed: _currentStep == 2 && _acceptTerms && !_isProcessing
+                      ? () {
+                          _processOrder();
+                        }
+                      : null,
                   fullWidth: true,
                 ),
               ),

@@ -6,7 +6,11 @@ import '../../config/theme/typography.dart';
 import '../../providers/notifiers/profile_notifier.dart';
 import '../../providers/notifiers/product_notifier.dart';
 import '../../providers/notifiers/notifications_notifier.dart';
+import '../../providers/notifiers/auth_notifier.dart';
+import '../../widgets/profile/profile_image_picker.dart';
 import '../notifications/notifications_screen.dart';
+import '../settings/settings_screen.dart';
+import '../auth/login_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -33,7 +37,12 @@ class ProfileScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             color: AppColors.foreground,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
           ),
         ],
       ),
@@ -60,7 +69,9 @@ class ProfileScreen extends ConsumerWidget {
               subtitle: activeOrders > 0
                   ? '$activeOrders active orders'
                   : 'View your past orders',
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/orders');
+              },
               badge: activeOrders > 0 ? activeOrders.toString() : null,
             ),
             _MenuItem(
@@ -230,27 +241,83 @@ class ProfileScreen extends ConsumerWidget {
             // Logout Button
             Padding(
               padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.destructive,
-                  side: const BorderSide(color: AppColors.destructive),
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                  ),
-                ),
-                child: Text(
-                  'Logout',
-                  style: AppTypography.labelLarge.copyWith(
-                    color: AppColors.destructive,
-                  ),
-                ),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  return OutlinedButton(
+                    onPressed: () {
+                      _showLogoutDialog(context, ref);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.destructive,
+                      side: const BorderSide(color: AppColors.destructive),
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                      ),
+                    ),
+                    child: Text(
+                      'Logout',
+                      style: AppTypography.labelLarge.copyWith(
+                        color: AppColors.destructive,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             SizedBox(height: AppSpacing.xl),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        title: Text(
+          'Logout',
+          style: AppTypography.h4.copyWith(color: AppColors.foreground),
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.foregroundSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: AppTypography.labelMedium.copyWith(
+                color: AppColors.foregroundSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              ref.read(authProvider.notifier).signOut();
+              Navigator.pop(context);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false,
+              );
+            },
+            child: Text(
+              'Logout',
+              style: AppTypography.labelMedium.copyWith(
+                color: AppColors.destructive,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -273,28 +340,8 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Avatar
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppRadius.full),
-              border: Border.all(
-                color: AppColors.primary.withOpacity(0.2),
-                width: 2,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                user.name[0].toUpperCase(),
-                style: AppTypography.h2.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: AppTypography.bold,
-                ),
-              ),
-            ),
-          ),
+          // Avatar with image picker
+          const ProfileImagePicker(size: 64, editable: true),
           SizedBox(width: AppSpacing.md),
 
           // User Info

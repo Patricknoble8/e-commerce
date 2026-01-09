@@ -9,6 +9,9 @@ import '../../data/category_data.dart';
 import '../product_detail/product_detail_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../categories/categories_screen.dart';
+import '../search/search_results_screen.dart';
+import '../../widgets/common/app_drawer.dart';
+import '../../widgets/common/filter_bottom_sheet.dart';
 
 /// Professional E-Commerce Home Screen
 /// shadcn/ui inspired design - Clean, minimal, elegant
@@ -21,13 +24,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final PageController _heroController = PageController();
+  final TextEditingController _searchController = TextEditingController();
   int _currentHeroPage = 0;
   Timer? _heroTimer;
   String _selectedFilter = 'All';
   int _selectedNavIndex = 0;
   late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
 
   // shadcn/ui inspired color palette
   static const Color _background = Color(0xFFFAFAFA);
@@ -46,10 +50,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOut,
-    );
     _fadeController.forward();
     _startHeroAutoScroll();
   }
@@ -57,8 +57,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     _heroTimer?.cancel();
+    _heroTimer = null;
     _heroController.dispose();
     _fadeController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -80,13 +82,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final unreadCount = ref.watch(unreadCountProvider);
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: _background,
+      drawer: const AppDrawer(),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
             HapticFeedback.mediumImpact();
             ref.invalidate(filteredProductsProvider);
-            await Future.delayed(const Duration(milliseconds: 500));
+            await Future.delayed(const Duration(milliseconds: 800));
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: const [
+                      Icon(Icons.check_circle, color: Colors.white, size: 20),
+                      SizedBox(width: 12),
+                      Text('Products refreshed!'),
+                    ],
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: _primary,
+                  duration: const Duration(seconds: 1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  margin: const EdgeInsets.all(16),
+                ),
+              );
+            }
           },
           color: _primary,
           backgroundColor: _card,
@@ -118,7 +142,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  // ============ NETWORK IMAGE WITH FADE & LOADING ============
+  // ============ NETWORK IMAGE WITH LOADING ============
   Widget _buildNetworkImage(
     String url, {
     BoxFit fit = BoxFit.cover,
@@ -160,7 +184,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         );
       },
-      errorBuilder: (_, __, ___) => Container(
+      errorBuilder: (context, error, stackTrace) => Container(
         width: width,
         height: height,
         color: _muted,
@@ -264,17 +288,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       toolbarHeight: 60,
       leading: Container(
         margin: const EdgeInsets.only(left: 16),
-        child: IconButton(
-          icon: Icon(Icons.menu_rounded, color: _foreground, size: 24),
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            // TODO: Open drawer
-          },
-          style: IconButton.styleFrom(
-            backgroundColor: _card,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: _border),
+        child: Semantics(
+          label: 'Open menu',
+          button: true,
+          child: IconButton(
+            icon: Icon(Icons.menu_rounded, color: _foreground, size: 24),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              _scaffoldKey.currentState?.openDrawer();
+            },
+            style: IconButton.styleFrom(
+              backgroundColor: _card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: _border),
+              ),
             ),
           ),
         ),
@@ -384,6 +412,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             const SizedBox(width: 12),
             Expanded(
               child: TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Search products...',
                   hintStyle: TextStyle(
@@ -395,19 +424,57 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   contentPadding: EdgeInsets.zero,
                 ),
                 style: TextStyle(color: _foreground, fontSize: 14),
+                textInputAction: TextInputAction.search,
                 onChanged: (value) {
                   ref.read(searchQueryProvider.notifier).state = value;
                 },
+                onSubmitted: (value) {
+                  if (value.trim().isNotEmpty) {
+                    HapticFeedback.lightImpact();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SearchResultsScreen(initialQuery: value.trim()),
+                      ),
+                    );
+                  }
+                },
               ),
             ),
-            Container(
-              margin: const EdgeInsets.all(6),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: _primary,
-                borderRadius: BorderRadius.circular(8),
+            Semantics(
+              label: 'Open filters',
+              button: true,
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => DraggableScrollableSheet(
+                      initialChildSize: 0.7,
+                      minChildSize: 0.5,
+                      maxChildSize: 0.9,
+                      builder: (context, scrollController) =>
+                          const FilterBottomSheet(),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _primary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.tune_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
               ),
-              child: Icon(Icons.tune_rounded, color: Colors.white, size: 18),
             ),
           ],
         ),
@@ -857,262 +924,261 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildProductCard(Product product, bool isFavorite) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailScreen(product: product),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: _card,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    return Semantics(
+      label:
+          '${product.name} by ${product.brand}, price \$${product.finalPrice.toStringAsFixed(0)}${product.hasDiscount ? ', ${product.discount!.toStringAsFixed(0)}% off' : ''}',
+      button: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailScreen(product: product),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image with favorite button
-            Expanded(
-              flex: 3,
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(11),
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: _buildNetworkImage(
-                        product.imageUrl,
-                        fit: BoxFit.cover,
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: _card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: _border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image with favorite button
+              Expanded(
+                flex: 3,
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(11),
                       ),
-                    ),
-                  ),
-                  // Favorite button
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(favoritesProvider.notifier)
-                            .toggleFavorite(product.id);
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isFavorite
-                              ? _destructive.withOpacity(0.1)
-                              : _card,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? _destructive : _mutedForeground,
-                          size: 18,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: _buildNetworkImage(
+                          product.imageUrl,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                  ),
-                  // Discount badge
-                  if (product.hasDiscount)
+                    // Favorite button
                     Positioned(
                       top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _destructive,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '-${product.discount!.toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            // Product info
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.brand,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: _mutedForeground,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      product.name,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: _foreground,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '\$${product.finalPrice.toStringAsFixed(0)}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: _foreground,
-                                ),
-                              ),
-                              if (product.hasDiscount)
-                                Text(
-                                  '\$${product.price.toStringAsFixed(0)}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: _mutedForeground,
-                                    decoration: TextDecoration.lineThrough,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
+                      right: 8,
+                      child: Semantics(
+                        label: isFavorite
+                            ? 'Remove from favorites'
+                            : 'Add to favorites',
+                        button: true,
+                        child: GestureDetector(
                           onTap: () {
-                            HapticFeedback.mediumImpact();
+                            HapticFeedback.lightImpact();
                             ref
-                                .read(cartProvider.notifier)
-                                .addToCart(
-                                  product,
-                                  product.availableColors.first,
-                                  product.availableSizes.first as int,
-                                );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.check_circle,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Text('Added to cart'),
-                                  ],
-                                ),
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: _primary,
-                                duration: const Duration(seconds: 2),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                margin: const EdgeInsets.all(16),
-                                action: SnackBarAction(
-                                  label: 'View',
-                                  textColor: Colors.white,
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/cart');
-                                  },
-                                ),
-                              ),
-                            );
+                                .read(favoritesProvider.notifier)
+                                .toggleFavorite(product.id);
                           },
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: _primary,
-                              borderRadius: BorderRadius.circular(10),
+                              color: isFavorite
+                                  ? _destructive.withOpacity(0.1)
+                                  : _card,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.08),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            child: const Icon(
-                              Icons.add_shopping_cart_rounded,
-                              color: Colors.white,
+                            child: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isFavorite
+                                  ? _destructive
+                                  : _mutedForeground,
                               size: 18,
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
+                    // Discount badge
+                    if (product.hasDiscount)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _destructive,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '-${product.discount!.toStringAsFixed(0)}%',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
-            ),
-          ],
+              // Product info
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.brand,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: _mutedForeground,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        product.name,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: _foreground,
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '\$${product.finalPrice.toStringAsFixed(0)}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: _foreground,
+                                  ),
+                                ),
+                                if (product.hasDiscount)
+                                  Text(
+                                    '\$${product.price.toStringAsFixed(0)}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: _mutedForeground,
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          Semantics(
+                            label: 'Add ${product.name} to cart',
+                            button: true,
+                            child: GestureDetector(
+                              onTap: () {
+                                HapticFeedback.mediumImpact();
+                                // Handle size safely - can be int or String
+                                final firstSize =
+                                    product.availableSizes.isNotEmpty
+                                    ? (product.availableSizes.first is int
+                                          ? product.availableSizes.first as int
+                                          : int.tryParse(
+                                                  product.availableSizes.first
+                                                      .toString(),
+                                                ) ??
+                                                0)
+                                    : 0;
+                                ref
+                                    .read(cartProvider.notifier)
+                                    .addToCart(
+                                      product,
+                                      product.availableColors.isNotEmpty
+                                          ? product.availableColors.first
+                                          : 'Default',
+                                      firstSize,
+                                    );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: const [
+                                        Icon(
+                                          Icons.check_circle,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                        SizedBox(width: 12),
+                                        Text('Added to cart'),
+                                      ],
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: _primary,
+                                    duration: const Duration(seconds: 2),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    margin: const EdgeInsets.all(16),
+                                    action: SnackBarAction(
+                                      label: 'View',
+                                      textColor: Colors.white,
+                                      onPressed: () {
+                                        Navigator.pushNamed(context, '/cart');
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: _primary,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.add_shopping_cart_rounded,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: _muted, shape: BoxShape.circle),
-            child: Icon(
-              Icons.search_off_rounded,
-              size: 32,
-              color: _mutedForeground,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No products found',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: _foreground,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Try adjusting your filters',
-            style: TextStyle(fontSize: 14, color: _mutedForeground),
-          ),
-        ],
       ),
     );
   }

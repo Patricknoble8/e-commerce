@@ -28,7 +28,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   String? _selectedColor;
   dynamic _selectedSize;
   bool _isAddingToCart = false;
-  int _stockCount = 15; // Mock stock count - in production, get from API
+  final int _stockCount = 15; // Mock stock count - in production, get from API
 
   late AnimationController _fabAnimationController;
 

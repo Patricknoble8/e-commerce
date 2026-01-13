@@ -5,6 +5,8 @@ import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
 import '../../widgets/buttons/buttons.dart';
 import '../../providers/providers.dart';
+import '../../models/shipping_address.dart';
+import '../orders/order_confirmation_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -1379,21 +1381,62 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
-  void _processOrder() {
+  Future<void> _processOrder() async {
     setState(() => _isProcessing = true);
 
-    // Simulate processing
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() => _isProcessing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Order placed successfully!'),
-          backgroundColor: Colors.green,
+    // Create the order
+    final cartState = ref.read(cartProvider);
+    final defaultAddress = ref.read(defaultAddressProvider);
+
+    // Use default address or create a placeholder
+    final shippingAddress =
+        defaultAddress ??
+        const ShippingAddress(
+          id: 'temp',
+          name: 'Default',
+          street: '123 Main Street',
+          city: 'New York',
+          state: 'NY',
+          zipCode: '10001',
+          country: 'USA',
+        );
+
+    final subtotal = cartState.subtotal;
+    final shippingCost = _selectedShippingMethod == 'express'
+        ? 15.99
+        : _selectedShippingMethod == 'overnight'
+        ? 29.99
+        : 5.99;
+    final tax = subtotal * 0.1;
+
+    // Create the order
+    final order = await ref
+        .read(orderProvider.notifier)
+        .createOrder(
+          items: cartState.items,
+          shippingAddress: shippingAddress,
+          paymentMethod: 'Visa •••• 4532',
+          subtotal: subtotal,
+          shippingCost: shippingCost,
+          tax: tax,
+          discount: _discountAmount,
+          promoCode: _appliedPromo,
+        );
+
+    // Clear the cart
+    ref.read(cartProvider.notifier).clearCart();
+
+    setState(() => _isProcessing = false);
+
+    // Navigate to order confirmation
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrderConfirmationScreen(order: order),
         ),
       );
-      // Navigate back to home
-      Navigator.popUntil(context, (route) => route.isFirst);
-    });
+    }
   }
 
   @override

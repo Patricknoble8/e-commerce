@@ -154,14 +154,23 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
   }
 
   Widget _buildCategoryChips() {
-    final categories = [
+    final categories = <ProductCategory?>[
       null, // For "All"
-      ProductCategory.clothing,
+      // Footwear & Clothing
       ProductCategory.footwear,
+      ProductCategory.clothing,
       ProductCategory.accessories,
+      // Electronics
       ProductCategory.smartphones,
       ProductCategory.laptops,
-      ProductCategory.watches,
+      ProductCategory.audio,
+      ProductCategory.gaming,
+      ProductCategory.wearables,
+      // Home
+      ProductCategory.furniture,
+      ProductCategory.kitchen,
+      ProductCategory.smartHome,
+      // Personal
       ProductCategory.skincare,
     ];
 
@@ -170,15 +179,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
       runSpacing: 8,
       children: categories.map((category) {
         final isSelected = _selectedCategory == category;
-        final label = category == null
-            ? 'All'
-            : category.name
-                  .replaceAllMapped(
-                    RegExp(r'([A-Z])'),
-                    (match) => ' ${match.group(0)}',
-                  )
-                  .trim()
-                  .capitalize();
+        final label = category == null ? 'All' : _getCategoryLabel(category);
 
         return GestureDetector(
           onTap: () {
@@ -205,6 +206,24 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
         );
       }).toList(),
     );
+  }
+
+  String _getCategoryLabel(ProductCategory category) {
+    final labels = {
+      ProductCategory.footwear: 'Footwear',
+      ProductCategory.clothing: 'Clothing',
+      ProductCategory.accessories: 'Accessories',
+      ProductCategory.smartphones: 'Phones',
+      ProductCategory.laptops: 'Laptops',
+      ProductCategory.audio: 'Audio',
+      ProductCategory.gaming: 'Gaming',
+      ProductCategory.wearables: 'Wearables',
+      ProductCategory.furniture: 'Furniture',
+      ProductCategory.kitchen: 'Kitchen',
+      ProductCategory.smartHome: 'Smart Home',
+      ProductCategory.skincare: 'Skincare',
+    };
+    return labels[category] ?? category.name.capitalize();
   }
 
   Widget _buildPriceRangeSlider() {

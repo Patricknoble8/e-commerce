@@ -37,7 +37,8 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
           message: 'You received a payment of \$200.00',
           amount: 200.00,
           senderName: 'John Smith',
-          senderImage: 'https://via.placeholder.com/50',
+          senderImage:
+              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
           timestamp: DateTime.now().subtract(const Duration(hours: 2)),
           isRead: true,
           status: 'completed',
@@ -49,7 +50,8 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
           message: 'James Smith is requesting a payment of \$450.00',
           amount: 450.00,
           senderName: 'James Smith',
-          senderImage: 'https://via.placeholder.com/50',
+          senderImage:
+              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
           timestamp: DateTime.now().subtract(const Duration(hours: 4)),
           isRead: false,
           status: 'pending',
@@ -81,7 +83,8 @@ class NotificationsNotifier extends StateNotifier<List<AppNotification>> {
           message: 'Wilson Henry is requesting a payment of \$400.00',
           amount: 400.00,
           senderName: 'Wilson Henry',
-          senderImage: 'https://via.placeholder.com/50',
+          senderImage:
+              'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
           timestamp: DateTime.now().subtract(const Duration(days: 1)),
           isRead: true,
           status: 'pending',

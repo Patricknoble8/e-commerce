@@ -1,5 +1,5 @@
 /// Export all review widgets
-library reviews;
+library;
 
 export 'star_rating.dart';
 export 'review_card.dart';

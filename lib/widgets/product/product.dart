@@ -1,4 +1,4 @@
 /// Export all product widgets
-library product;
+library;
 
 export 'product_detail_widgets.dart';

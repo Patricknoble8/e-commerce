@@ -50,6 +50,9 @@ dependencies:
   
   # Image picker for review photos
   image_picker: ^1.0.7
+  shared_preferences: ^2.5.4
+  dio: ^5.9.0
+  flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
   flutter_test:

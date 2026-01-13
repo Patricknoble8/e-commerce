@@ -10,7 +10,13 @@ import '../../providers/notifiers/auth_notifier.dart';
 import '../../widgets/profile/profile_image_picker.dart';
 import '../notifications/notifications_screen.dart';
 import '../settings/settings_screen.dart';
+import '../settings/size_preferences_screen.dart';
+import '../settings/security_settings_screen.dart';
+import '../settings/notification_preferences_screen.dart';
+import '../settings/returns_refunds_screen.dart';
 import '../auth/login_screen.dart';
+import 'edit_profile_screen.dart';
+import '../settings/address_management_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -87,7 +93,14 @@ class ProfileScreen extends ConsumerWidget {
               icon: Icons.location_on_outlined,
               title: 'Shipping Addresses',
               subtitle: '${addresses.length} saved addresses',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddressManagementScreen(),
+                  ),
+                );
+              },
             ),
             _MenuItem(
               icon: Icons.payment_outlined,
@@ -101,7 +114,14 @@ class ProfileScreen extends ConsumerWidget {
               icon: Icons.assignment_return_outlined,
               title: 'Returns & Refunds',
               subtitle: 'Manage your returns',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ReturnsRefundsScreen(),
+                  ),
+                );
+              },
             ),
             SizedBox(height: AppSpacing.lg),
 
@@ -153,7 +173,14 @@ class ProfileScreen extends ConsumerWidget {
               icon: Icons.straighten_outlined,
               title: 'Size Preferences',
               subtitle: 'Save your default sizes',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SizePreferencesScreen(),
+                  ),
+                );
+              },
             ),
             _MenuItem(
               icon: Icons.notifications_outlined,
@@ -183,7 +210,14 @@ class ProfileScreen extends ConsumerWidget {
               icon: Icons.email_outlined,
               title: 'Marketing Preferences',
               subtitle: 'Newsletter & promotions',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationPreferencesScreen(),
+                  ),
+                );
+              },
             ),
             SizedBox(height: AppSpacing.lg),
 
@@ -193,7 +227,14 @@ class ProfileScreen extends ConsumerWidget {
               icon: Icons.lock_outlined,
               title: 'Security & Password',
               subtitle: 'Change your password',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SecuritySettingsScreen(),
+                  ),
+                );
+              },
             ),
             _MenuItem(
               icon: Icons.privacy_tip_outlined,
@@ -400,7 +441,14 @@ class _ProfileHeader extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             color: AppColors.foregroundSecondary,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EditProfileScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),

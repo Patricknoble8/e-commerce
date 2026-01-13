@@ -49,4 +49,37 @@ class User {
       walletBalance: walletBalance ?? this.walletBalance,
     );
   }
+
+  /// Create User from JSON response
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? json['full_name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'],
+      avatarUrl: json['avatar_url'] ?? json['avatar'] ?? json['profile_image'],
+      membershipTier: json['membership_tier'] ?? json['tier'] ?? 'Bronze',
+      loyaltyPoints: json['loyalty_points'] ?? json['points'] ?? 0,
+      totalOrders: json['total_orders'] ?? json['orders_count'] ?? 0,
+      totalReviews: json['total_reviews'] ?? json['reviews_count'] ?? 0,
+      walletBalance: (json['wallet_balance'] ?? json['balance'] ?? 0)
+          .toDouble(),
+    );
+  }
+
+  /// Convert User to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'avatar_url': avatarUrl,
+      'membership_tier': membershipTier,
+      'loyalty_points': loyaltyPoints,
+      'total_orders': totalOrders,
+      'total_reviews': totalReviews,
+      'wallet_balance': walletBalance,
+    };
+  }
 }

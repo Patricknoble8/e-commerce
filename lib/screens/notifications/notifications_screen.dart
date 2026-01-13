@@ -190,12 +190,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                           ),
 
                           // Notifications in this section
-                          ...sectionNotifications
-                              .map(
-                                (notification) =>
-                                    _buildNotificationCard(notification),
-                              )
-                              .toList(),
+                          ...sectionNotifications.map(
+                            (notification) =>
+                                _buildNotificationCard(notification),
+                          ),
 
                           if (index < groupedNotifications.length - 1)
                             SizedBox(height: AppSpacing.lg),

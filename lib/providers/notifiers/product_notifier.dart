@@ -1,9 +1,160 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/product.dart';
 import '../../data/product_data.dart';
+import '../../services/api/services/products_api_service.dart';
+import '../../services/api/services/wishlist_api_service.dart';
 
-/// Product list provider
+/// Set to true to use real API, false for demo mode
+const bool useProductApiMode = false;
+
+/// Product list state for API mode
+class ProductListState {
+  final List<Product> products;
+  final bool isLoading;
+  final String? error;
+  final bool hasMore;
+  final int currentPage;
+
+  const ProductListState({
+    this.products = const [],
+    this.isLoading = false,
+    this.error,
+    this.hasMore = true,
+    this.currentPage = 1,
+  });
+
+  ProductListState copyWith({
+    List<Product>? products,
+    bool? isLoading,
+    String? error,
+    bool? hasMore,
+    int? currentPage,
+  }) {
+    return ProductListState(
+      products: products ?? this.products,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+      hasMore: hasMore ?? this.hasMore,
+      currentPage: currentPage ?? this.currentPage,
+    );
+  }
+}
+
+/// Product notifier for API mode
+class ProductNotifier extends StateNotifier<ProductListState> {
+  final ProductsApiService _productsService;
+
+  ProductNotifier({ProductsApiService? productsService})
+    : _productsService = productsService ?? ProductsApiService(),
+      super(const ProductListState(isLoading: true)) {
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    if (useProductApiMode) {
+      try {
+        final response = await _productsService.getProducts();
+        state = ProductListState(
+          products: response.products,
+          isLoading: false,
+          hasMore: response.hasMore,
+          currentPage: response.page,
+        );
+      } catch (e) {
+        state = ProductListState(
+          products: ProductData.products, // Fallback to demo data
+          isLoading: false,
+          error: 'Failed to load products',
+        );
+      }
+    } else {
+      // Demo mode - use local data
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (mounted) {
+        state = ProductListState(
+          products: ProductData.products,
+          isLoading: false,
+          hasMore: false,
+        );
+      }
+    }
+  }
+
+  /// Load more products (pagination)
+  Future<void> loadMore() async {
+    if (!state.hasMore || state.isLoading) return;
+
+    state = state.copyWith(isLoading: true);
+
+    if (useProductApiMode) {
+      try {
+        final response = await _productsService.getProducts(
+          page: state.currentPage + 1,
+        );
+        state = state.copyWith(
+          products: [...state.products, ...response.products],
+          isLoading: false,
+          hasMore: response.hasMore,
+          currentPage: response.page,
+        );
+      } catch (e) {
+        state = state.copyWith(isLoading: false, error: 'Failed to load more');
+      }
+    } else {
+      state = state.copyWith(isLoading: false, hasMore: false);
+    }
+  }
+
+  /// Refresh products
+  Future<void> refresh() async {
+    state = state.copyWith(isLoading: true, currentPage: 1);
+    await _loadProducts();
+  }
+
+  /// Search products
+  Future<List<Product>> searchProducts(String query) async {
+    if (useProductApiMode) {
+      try {
+        final response = await _productsService.searchProducts(query: query);
+        return response.products;
+      } catch (e) {
+        // Fallback to local search
+      }
+    }
+
+    // Local search
+    final queryLower = query.toLowerCase();
+    return state.products.where((p) {
+      return p.name.toLowerCase().contains(queryLower) ||
+          p.brand.toLowerCase().contains(queryLower) ||
+          p.description.toLowerCase().contains(queryLower);
+    }).toList();
+  }
+
+  /// Get featured products
+  Future<List<Product>> getFeaturedProducts() async {
+    if (useProductApiMode) {
+      try {
+        return await _productsService.getFeaturedProducts();
+      } catch (e) {
+        // Fallback to demo data
+      }
+    }
+    return state.products.take(6).toList();
+  }
+}
+
+/// Product notifier provider (for API mode)
+final productNotifierProvider =
+    StateNotifierProvider<ProductNotifier, ProductListState>(
+      (ref) => ProductNotifier(),
+    );
+
+/// Product list provider (works in both modes)
 final productListProvider = Provider<List<Product>>((ref) {
+  if (useProductApiMode) {
+    return ref.watch(productNotifierProvider).products;
+  }
   return ProductData.products;
 });
 
@@ -25,18 +176,11 @@ final priceRangeProvider = StateProvider<(double, double)?>((ref) => null);
 Set<ProductCategory> _getCategoryMatches(ProductCategory selected) {
   switch (selected) {
     case ProductCategory.footwear:
-      return {
-        ProductCategory.footwear,
-        ProductCategory.lifestyle,
-        ProductCategory.running,
-        ProductCategory.basketball,
-        ProductCategory.casual,
-        ProductCategory.skate,
-      };
+      return {ProductCategory.footwear};
     case ProductCategory.sportswear:
-      return {ProductCategory.sportswear, ProductCategory.training};
+      return {ProductCategory.sportswear};
     case ProductCategory.clothing:
-      return {ProductCategory.clothing, ProductCategory.apparel};
+      return {ProductCategory.clothing};
     case ProductCategory.smartphones:
       return {ProductCategory.smartphones};
     case ProductCategory.laptops:
@@ -72,9 +216,15 @@ Set<ProductCategory> _getCategoryMatches(ProductCategory selected) {
     case ProductCategory.petSupplies:
       return {ProductCategory.petSupplies};
     case ProductCategory.accessories:
-      return {ProductCategory.accessories, ProductCategory.eyewear};
+      return {
+        ProductCategory.accessories,
+        ProductCategory.eyewear,
+        ProductCategory.watches,
+      };
     case ProductCategory.watches:
-      return {ProductCategory.watches};
+      return {ProductCategory.watches, ProductCategory.wearables};
+    case ProductCategory.smartHome:
+      return {ProductCategory.smartHome};
     default:
       return {selected};
   }
@@ -133,15 +283,52 @@ final productsByCategoryProvider = Provider.family<List<Product>, String>((
   return products;
 });
 
-/// Favorite products state
+/// Favorite products state with API support
 class FavoritesNotifier extends StateNotifier<Set<String>> {
-  FavoritesNotifier() : super({});
+  final WishlistApiService _wishlistService;
 
-  void toggleFavorite(String productId) {
-    if (state.contains(productId)) {
+  FavoritesNotifier({WishlistApiService? wishlistService})
+    : _wishlistService = wishlistService ?? WishlistApiService(),
+      super({}) {
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    if (useProductApiMode) {
+      try {
+        final wishlist = await _wishlistService.getWishlist();
+        state = wishlist.map((p) => p.id).toSet();
+      } catch (e) {
+        // Keep empty state on error
+      }
+    }
+  }
+
+  Future<void> toggleFavorite(String productId) async {
+    final wasInFavorites = state.contains(productId);
+
+    // Optimistic update
+    if (wasInFavorites) {
       state = {...state}..remove(productId);
     } else {
       state = {...state, productId};
+    }
+
+    if (useProductApiMode) {
+      try {
+        if (wasInFavorites) {
+          await _wishlistService.removeFromWishlist(productId);
+        } else {
+          await _wishlistService.addToWishlist(productId);
+        }
+      } catch (e) {
+        // Revert on error
+        if (wasInFavorites) {
+          state = {...state, productId};
+        } else {
+          state = {...state}..remove(productId);
+        }
+      }
     }
   }
 

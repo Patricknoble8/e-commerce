@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import '../../config/theme/colors.dart';
 import '../../models/order.dart';
 import '../../providers/notifiers/order_notifier.dart';
+import '../../providers/notifiers/cart_notifier.dart';
+import '../cart/cart_screen.dart';
+import 'contact_support_screen.dart';
 
 class OrderDetailScreen extends ConsumerWidget {
   final String orderId;
@@ -581,64 +584,106 @@ class OrderDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildActions(BuildContext context, Order order) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (order.status == OrderStatus.delivered) ...[
-          ElevatedButton(
-            onPressed: () {
-              // TODO: Navigate to write review
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Write review coming soon!')),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.primaryForeground,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+    return Consumer(
+      builder: (context, ref, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (order.status == OrderStatus.delivered) ...[
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to write review
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Write review coming soon!')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.primaryForeground,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Write a Review'),
               ),
-            ),
-            child: const Text('Write a Review'),
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(
-            onPressed: () {
-              // TODO: Reorder
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Reorder coming soon!')),
-              );
-            },
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              side: const BorderSide(color: AppColors.border),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: () => _reorderItems(context, ref, order),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: AppColors.border),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Buy Again'),
               ),
-            ),
-            child: const Text('Buy Again'),
-          ),
-        ] else ...[
-          OutlinedButton.icon(
-            onPressed: () {
-              // TODO: Contact support
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Support contact coming soon!')),
-              );
-            },
-            icon: const Icon(Icons.headset_mic_outlined),
-            label: const Text('Need Help?'),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              side: const BorderSide(color: AppColors.border),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            ] else ...[
+              OutlinedButton.icon(
+                onPressed: () => _contactSupport(context, order),
+                icon: const Icon(Icons.headset_mic_outlined),
+                label: const Text('Need Help?'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: AppColors.border),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
-      ],
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+  void _reorderItems(BuildContext context, WidgetRef ref, Order order) {
+    // Add all items from the order to the cart
+    final cartNotifier = ref.read(cartProvider.notifier);
+
+    int addedCount = 0;
+    for (final item in order.items) {
+      cartNotifier.addToCart(
+        item.product,
+        item.selectedColor,
+        item.selectedSize,
+      );
+      addedCount++;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 12),
+            Text('$addedCount item${addedCount > 1 ? 's' : ''} added to cart'),
+          ],
+        ),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'View Cart',
+          textColor: Colors.white,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CartScreen()),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _contactSupport(BuildContext context, Order order) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactSupportScreen(order: order),
+      ),
     );
   }
 

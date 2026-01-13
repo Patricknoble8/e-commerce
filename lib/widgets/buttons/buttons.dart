@@ -28,25 +28,26 @@ class PrimaryButton extends StatelessWidget {
       height: 44,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.primaryForeground,
-          disabledBackgroundColor: AppColors.muted,
-          disabledForegroundColor: AppColors.mutedForeground,
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.paddingMd,
-            vertical: AppSpacing.paddingSm,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-        ).copyWith(
-          overlayColor: MaterialStateProperty.all(
-            AppColors.primaryHover.withOpacity(0.1),
-          ),
-        ),
+        style:
+            ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.primaryForeground,
+              disabledBackgroundColor: AppColors.muted,
+              disabledForegroundColor: AppColors.mutedForeground,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingMd,
+                vertical: AppSpacing.paddingSm,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+            ).copyWith(
+              overlayColor: WidgetStateProperty.all(
+                AppColors.primaryHover.withOpacity(0.1),
+              ),
+            ),
         child: isLoading
             ? const SizedBox(
                 width: 20,
@@ -101,24 +102,25 @@ class SecondaryButton extends StatelessWidget {
       height: 44,
       child: OutlinedButton(
         onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.foreground,
-          side: const BorderSide(
-            color: AppColors.border,
-            width: AppBorderWidth.thin,
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: AppSpacing.paddingMd,
-            vertical: AppSpacing.paddingSm,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-        ).copyWith(
-          overlayColor: MaterialStateProperty.all(
-            AppColors.secondary.withOpacity(0.5),
-          ),
-        ),
+        style:
+            OutlinedButton.styleFrom(
+              foregroundColor: AppColors.foreground,
+              side: const BorderSide(
+                color: AppColors.border,
+                width: AppBorderWidth.thin,
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.paddingMd,
+                vertical: AppSpacing.paddingSm,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+            ).copyWith(
+              overlayColor: WidgetStateProperty.all(
+                AppColors.secondary.withOpacity(0.5),
+              ),
+            ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -146,28 +148,24 @@ class GhostButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData? icon;
 
-  const GhostButton({
-    super.key,
-    required this.text,
-    this.onPressed,
-    this.icon,
-  });
+  const GhostButton({super.key, required this.text, this.onPressed, this.icon});
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onPressed,
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.foreground,
-        padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.paddingMd,
-          vertical: AppSpacing.paddingSm,
-        ),
-      ).copyWith(
-        overlayColor: MaterialStateProperty.all(
-          AppColors.muted.withOpacity(0.5),
-        ),
-      ),
+      style:
+          TextButton.styleFrom(
+            foregroundColor: AppColors.foreground,
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.paddingMd,
+              vertical: AppSpacing.paddingSm,
+            ),
+          ).copyWith(
+            overlayColor: WidgetStateProperty.all(
+              AppColors.muted.withOpacity(0.5),
+            ),
+          ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -175,10 +173,7 @@ class GhostButton extends StatelessWidget {
             Icon(icon, size: 18),
             SizedBox(width: AppSpacing.gapSm),
           ],
-          Text(
-            text,
-            style: AppTypography.labelLarge,
-          ),
+          Text(text, style: AppTypography.labelLarge),
         ],
       ),
     );
@@ -220,11 +215,7 @@ class IconButtonComponent extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(AppRadius.md),
           ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: iconColor ?? AppColors.foreground,
-          ),
+          child: Icon(icon, size: 20, color: iconColor ?? AppColors.foreground),
         ),
       ),
     );

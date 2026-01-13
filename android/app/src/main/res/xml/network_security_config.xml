@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <!-- Allow cleartext traffic for local development -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
     </domain-config>
-    <domain-config>
-        <domain includeSubdomains="true">images.unsplash.com</domain>
+    
+    <!-- Base config for all other domains - use system trust store -->
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
-    </domain-config>
+    </base-config>
 </network-security-config>

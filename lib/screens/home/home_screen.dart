@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/providers.dart';
-import '../../providers/notifiers/notifications_notifier.dart';
 import '../../models/product.dart';
 import '../../data/category_data.dart';
 import '../product_detail/product_detail_screen.dart';
@@ -560,15 +559,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
-                                  vertical: 4,
+                                  vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.2),
@@ -577,38 +577,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 child: Text(
                                   slide['title'] as String,
                                   style: const TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 9,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                     letterSpacing: 1.2,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 6),
                               Text(
                                 slide['discount'] as String,
                                 style: const TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 28,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.white,
                                   letterSpacing: -1,
                                   height: 1.1,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 2),
                               Text(
                                 slide['subtitle'] as String,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.white.withOpacity(0.8),
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 10),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 10,
+                                  horizontal: 16,
+                                  vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -620,15 +620,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     Text(
                                       slide['cta'] as String,
                                       style: TextStyle(
-                                        fontSize: 13,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                         color: _foreground,
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
+                                    const SizedBox(width: 4),
                                     Icon(
                                       Icons.arrow_forward,
-                                      size: 14,
+                                      size: 12,
                                       color: _foreground,
                                     ),
                                   ],
@@ -896,7 +896,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.65,
+          childAspectRatio: 0.60,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
@@ -910,7 +910,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.65,
+        childAspectRatio: 0.60,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
@@ -1047,30 +1047,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               Expanded(
                 flex: 2,
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         product.brand,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w500,
                           color: _mutedForeground,
                           letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        product.name,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: _foreground,
-                          height: 1.3,
+                      Flexible(
+                        child: Text(
+                          product.name,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: _foreground,
+                            height: 1.2,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const Spacer(),
                       Row(
@@ -1078,11 +1081,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   '\$${product.finalPrice.toStringAsFixed(0)}',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: _foreground,
                                   ),
@@ -1091,7 +1095,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   Text(
                                     '\$${product.price.toStringAsFixed(0)}',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w400,
                                       color: _mutedForeground,
                                       decoration: TextDecoration.lineThrough,

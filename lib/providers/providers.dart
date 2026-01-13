@@ -1,6 +1,6 @@
 /// Export all providers and notifiers
 /// This provides a clean single import point for all state management
-library providers;
+library;
 
 // State classes
 export 'state/cart_state.dart';

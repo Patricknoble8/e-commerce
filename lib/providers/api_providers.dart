@@ -6,6 +6,8 @@ import '../services/api/services/product_service.dart';
 import '../services/api/services/order_service.dart';
 import '../services/api/services/cart_service.dart';
 import '../services/api/services/wishlist_service.dart';
+import 'notifiers/cart_notifier.dart';
+import 'state/cart_state.dart';
 
 /// ============================================================
 /// API Service Providers
@@ -57,8 +59,8 @@ final wishlistServiceProvider = Provider<WishlistService>((ref) {
 /// API Configuration State
 /// ============================================================
 
-/// Whether to use the API or demo mode
-final useApiModeProvider = StateProvider<bool>((ref) => false);
+/// Whether to use the API or demo mode (defaults to true for production)
+final useApiModeProvider = StateProvider<bool>((ref) => true);
 
 /// API connection status
 enum ApiConnectionStatus { connected, disconnected, checking, error }
@@ -95,176 +97,36 @@ final apiHealthCheckProvider = FutureProvider<bool>((ref) async {
 });
 
 /// ============================================================
-/// Cart State Providers
+/// Cart State Provider - with API service injection
 /// ============================================================
 
-/// Cart state
+/// Cart provider - Main state management for shopping cart
+/// Injects CartService for API integration
 final cartProvider = StateNotifierProvider<CartNotifier, CartState>((ref) {
   final cartService = ref.watch(cartServiceProvider);
-  final useApi = ref.watch(useApiModeProvider);
-  return CartNotifier(cartService: cartService, useApi: useApi);
+  return CartNotifier(cartService: cartService);
 });
 
-/// Cart state model
-class CartState {
-  final Cart? cart;
-  final bool isLoading;
-  final String? error;
-  final bool isApplyingCoupon;
+/// Computed providers for specific cart values
+final cartItemCountProvider = Provider<int>((ref) {
+  final cart = ref.watch(cartProvider);
+  return cart.itemCount;
+});
 
-  CartState({
-    this.cart,
-    this.isLoading = false,
-    this.error,
-    this.isApplyingCoupon = false,
-  });
+final cartSubtotalProvider = Provider<double>((ref) {
+  final cart = ref.watch(cartProvider);
+  return cart.subtotal;
+});
 
-  CartState copyWith({
-    Cart? cart,
-    bool? isLoading,
-    String? error,
-    bool? isApplyingCoupon,
-  }) {
-    return CartState(
-      cart: cart ?? this.cart,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      isApplyingCoupon: isApplyingCoupon ?? this.isApplyingCoupon,
-    );
-  }
+final cartTotalProvider = Provider<double>((ref) {
+  final cart = ref.watch(cartProvider);
+  return cart.total;
+});
 
-  int get itemCount => cart?.itemCount ?? 0;
-  double get total => cart?.total ?? 0;
-  bool get isEmpty => cart?.isEmpty ?? true;
-}
-
-/// Cart state notifier
-class CartNotifier extends StateNotifier<CartState> {
-  final CartService _cartService;
-  final bool _useApi;
-
-  CartNotifier({required CartService cartService, required bool useApi})
-    : _cartService = cartService,
-      _useApi = useApi,
-      super(CartState());
-
-  /// Load cart from API
-  Future<void> loadCart() async {
-    if (!_useApi) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final cart = await _cartService.getCart();
-      state = state.copyWith(cart: cart, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-
-  /// Add item to cart
-  Future<void> addToCart({
-    required String productId,
-    required int quantity,
-    String? size,
-    String? color,
-  }) async {
-    if (!_useApi) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final cart = await _cartService.addToCart(
-        productId: productId,
-        quantity: quantity,
-        size: size,
-        color: color,
-      );
-      state = state.copyWith(cart: cart, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-
-  /// Update cart item quantity
-  Future<void> updateQuantity(String itemId, int quantity) async {
-    if (!_useApi) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final cart = await _cartService.updateCartItem(
-        itemId: itemId,
-        quantity: quantity,
-      );
-      state = state.copyWith(cart: cart, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-
-  /// Remove item from cart
-  Future<void> removeItem(String itemId) async {
-    if (!_useApi) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final cart = await _cartService.removeFromCart(itemId);
-      state = state.copyWith(cart: cart, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-
-  /// Clear entire cart
-  Future<void> clearCart() async {
-    if (!_useApi) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      await _cartService.clearCart();
-      state = CartState();
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-
-  /// Apply coupon code
-  Future<bool> applyCoupon(String code) async {
-    if (!_useApi) return false;
-
-    state = state.copyWith(isApplyingCoupon: true, error: null);
-    try {
-      final result = await _cartService.applyCoupon(code);
-      if (result.valid && result.updatedCart != null) {
-        state = state.copyWith(
-          cart: result.updatedCart,
-          isApplyingCoupon: false,
-        );
-        return true;
-      } else {
-        state = state.copyWith(
-          isApplyingCoupon: false,
-          error: result.message ?? 'Invalid coupon code',
-        );
-        return false;
-      }
-    } catch (e) {
-      state = state.copyWith(isApplyingCoupon: false, error: e.toString());
-      return false;
-    }
-  }
-
-  /// Remove applied coupon
-  Future<void> removeCoupon() async {
-    if (!_useApi) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final cart = await _cartService.removeCoupon();
-      state = state.copyWith(cart: cart, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
-  }
-}
+final cartDeliveryChargeProvider = Provider<double>((ref) {
+  final cart = ref.watch(cartProvider);
+  return cart.deliveryCharge;
+});
 
 /// ============================================================
 /// Wishlist Providers (Placeholder)

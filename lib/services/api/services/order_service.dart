@@ -93,7 +93,7 @@ class OrderService {
 
   /// Cancel an order
   Future<Order> cancelOrder(String orderId, {String? reason}) async {
-    final response = await _client.post(
+    final response = await _client.put(
       ApiConfig.cancelOrder(orderId),
       body: {if (reason != null) 'reason': reason},
     );

@@ -69,19 +69,20 @@ class ApiConfig {
   // ============ Cart Endpoints ============
 
   static const String cart = '/cart';
-  static const String addToCart = '/cart/add';
-  static const String updateCartItem = '/cart/update';
-  static String removeFromCart(String itemId) => '/cart/remove/$itemId';
-  static const String clearCart = '/cart/clear';
-  static const String applyCoupon = '/cart/coupon';
-  static const String removeCoupon = '/cart/coupon/remove';
+  static const String addToCart = '/cart/items'; // POST
+  static String updateCartItem(String itemId) => '/cart/items/$itemId'; // PUT
+  static String removeFromCart(String itemId) =>
+      '/cart/items/$itemId'; // DELETE
+  static const String clearCart = '/cart'; // DELETE
+  static const String applyCoupon = '/cart/coupon'; // POST
+  static const String removeCoupon = '/cart/coupon'; // DELETE
 
   // ============ Order Endpoints ============
 
   static const String orders = '/orders';
   static String orderById(String id) => '/orders/$id';
-  static const String createOrder = '/orders/create';
-  static String cancelOrder(String id) => '/orders/$id/cancel';
+  static const String createOrder = '/orders'; // POST to create new order
+  static String cancelOrder(String id) => '/orders/$id/cancel'; // PUT
   static String trackOrder(String id) => '/orders/$id/track';
   static String reorder(String id) => '/orders/$id/reorder';
 

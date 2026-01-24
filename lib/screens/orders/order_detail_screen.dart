@@ -6,6 +6,7 @@ import '../../config/theme/colors.dart';
 import '../../models/order.dart';
 import '../../providers/notifiers/order_notifier.dart';
 import '../../providers/notifiers/cart_notifier.dart';
+import '../../providers/api_providers.dart';
 import '../cart/cart_screen.dart';
 import 'contact_support_screen.dart';
 

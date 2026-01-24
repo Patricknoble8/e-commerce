@@ -2,12 +2,14 @@ import 'product.dart';
 
 /// Cart item model representing a product in the shopping cart
 class CartItem {
+  final String? id; // Cart item ID from backend
   final Product product;
   final int quantity;
   final String selectedColor;
   final int selectedSize;
 
   const CartItem({
+    this.id,
     required this.product,
     required this.quantity,
     required this.selectedColor,
@@ -19,6 +21,7 @@ class CartItem {
   /// Create from JSON (API response)
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
+      id: json['id']?.toString() ?? json['_id']?.toString(),
       product: json['product'] is Map<String, dynamic>
           ? Product.fromJson(json['product'])
           : Product(
@@ -43,6 +46,7 @@ class CartItem {
   /// Convert to JSON (for API requests)
   Map<String, dynamic> toJson() {
     return {
+      if (id != null) 'id': id,
       'productId': product.id,
       'quantity': quantity,
       'selectedColor': selectedColor,
@@ -58,12 +62,14 @@ class CartItem {
   double get price => product.finalPrice;
 
   CartItem copyWith({
+    String? id,
     Product? product,
     int? quantity,
     String? selectedColor,
     int? selectedSize,
   }) {
     return CartItem(
+      id: id ?? this.id,
       product: product ?? this.product,
       quantity: quantity ?? this.quantity,
       selectedColor: selectedColor ?? this.selectedColor,

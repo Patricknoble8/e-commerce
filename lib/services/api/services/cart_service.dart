@@ -42,8 +42,8 @@ class CartService {
     required int quantity,
   }) async {
     final response = await _client.put(
-      ApiConfig.updateCartItem,
-      body: {'itemId': itemId, 'quantity': quantity},
+      ApiConfig.updateCartItem(itemId),
+      body: {'quantity': quantity},
     );
     return Cart.fromJson(response.dataAsMap);
   }

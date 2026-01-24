@@ -3,10 +3,10 @@ import '../../models/order.dart';
 import '../../models/cart_item.dart';
 import '../../models/shipping_address.dart';
 import '../../data/order_data.dart';
-import '../../services/api/services/orders_api_service.dart';
+import '../../services/api/services/order_service.dart';
 
-/// Set to true to use real API, false for demo mode
-const bool useOrderApiMode = false;
+/// Global flag for API mode - can be toggled at runtime
+bool useOrderApiMode = true;
 
 /// Order list state
 class OrderListState {
@@ -42,36 +42,33 @@ enum OrderFilter { all, active, completed, cancelled }
 
 /// Order notifier for managing orders
 class OrderNotifier extends StateNotifier<OrderListState> {
-  final OrdersApiService _ordersService;
+  final OrderService? _ordersService;
 
-  OrderNotifier({OrdersApiService? ordersService})
-    : _ordersService = ordersService ?? OrdersApiService(),
+  OrderNotifier({OrderService? ordersService})
+    : _ordersService = ordersService,
       super(const OrderListState(isLoading: true)) {
     _loadOrders();
   }
 
   Future<void> _loadOrders() async {
-    if (useOrderApiMode) {
+    if (useOrderApiMode && _ordersService != null) {
       try {
         final response = await _ordersService.getOrders();
-        state = state.copyWith(orders: response.orders, isLoading: false);
-      } catch (e) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'Failed to load orders',
-        );
-      }
-    } else {
-      // Demo mode
-      Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          state = state.copyWith(
-            orders: OrderData.getOrders(),
-            isLoading: false,
-          );
+          state = state.copyWith(orders: response.orders, isLoading: false);
         }
-      });
+        return;
+      } catch (e) {
+        // Fall through to demo data
+      }
     }
+
+    // Demo mode
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        state = state.copyWith(orders: OrderData.getOrders(), isLoading: false);
+      }
+    });
   }
 
   /// Filter orders
@@ -110,40 +107,27 @@ class OrderNotifier extends StateNotifier<OrderListState> {
 
   /// Cancel an order
   Future<void> cancelOrder(String orderId) async {
-    if (useOrderApiMode) {
-      try {
-        final cancelledOrder = await _ordersService.cancelOrder(orderId);
-        final updatedOrders = state.orders.map((order) {
-          if (order.id == orderId) return cancelledOrder;
-          return order;
-        }).toList();
-        state = state.copyWith(orders: updatedOrders);
-      } catch (e) {
-        state = state.copyWith(error: 'Failed to cancel order');
+    // Demo mode
+    final updatedOrders = state.orders.map((order) {
+      if (order.id == orderId && order.canCancel) {
+        return order.copyWith(
+          status: OrderStatus.cancelled,
+          timeline: [
+            ...order.timeline,
+            OrderTimelineEvent(
+              title: 'Order Cancelled',
+              description: 'Order was cancelled by customer',
+              timestamp: DateTime.now(),
+              status: OrderStatus.cancelled,
+              isCompleted: true,
+            ),
+          ],
+        );
       }
-    } else {
-      // Demo mode
-      final updatedOrders = state.orders.map((order) {
-        if (order.id == orderId && order.canCancel) {
-          return order.copyWith(
-            status: OrderStatus.cancelled,
-            timeline: [
-              ...order.timeline,
-              OrderTimelineEvent(
-                title: 'Order Cancelled',
-                description: 'Order was cancelled by customer',
-                timestamp: DateTime.now(),
-                status: OrderStatus.cancelled,
-                isCompleted: true,
-              ),
-            ],
-          );
-        }
-        return order;
-      }).toList();
+      return order;
+    }).toList();
 
-      state = state.copyWith(orders: updatedOrders);
-    }
+    state = state.copyWith(orders: updatedOrders);
   }
 
   /// Create a new order from cart items
@@ -157,23 +141,6 @@ class OrderNotifier extends StateNotifier<OrderListState> {
     double discount = 0,
     String? promoCode,
   }) async {
-    if (useOrderApiMode) {
-      try {
-        final request = CreateOrderRequest(
-          items: items,
-          shippingAddress: shippingAddress,
-          paymentMethodId: paymentMethod,
-          promoCode: promoCode,
-        );
-        final newOrder = await _ordersService.createOrder(request);
-        state = state.copyWith(orders: [newOrder, ...state.orders]);
-        return newOrder;
-      } catch (e) {
-        // Fall through to demo mode if API fails
-        rethrow;
-      }
-    }
-
     // Demo mode
     final orderNumber =
         'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
@@ -212,14 +179,6 @@ class OrderNotifier extends StateNotifier<OrderListState> {
 
   /// Reorder - add items from an order to cart
   Future<List<CartItem>> getReorderItems(String orderId) async {
-    if (useOrderApiMode) {
-      try {
-        return await _ordersService.getReorderItems(orderId);
-      } catch (e) {
-        // Fall through to local
-      }
-    }
-
     try {
       final order = state.orders.firstWhere((o) => o.id == orderId);
       return order.items;
@@ -232,7 +191,7 @@ class OrderNotifier extends StateNotifier<OrderListState> {
   Future<void> refresh() async {
     state = state.copyWith(isLoading: true);
 
-    if (useOrderApiMode) {
+    if (useOrderApiMode && _ordersService != null) {
       try {
         final response = await _ordersService.getOrders();
         state = state.copyWith(orders: response.orders, isLoading: false);

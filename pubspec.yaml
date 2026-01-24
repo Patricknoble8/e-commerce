@@ -53,6 +53,9 @@ dependencies:
   shared_preferences: ^2.5.4
   dio: ^5.9.0
   flutter_secure_storage: ^10.0.0
+  
+  # Shopify Storefront API integration
+  shopify_flutter: ^2.6.1
 
 dev_dependencies:
   flutter_test:

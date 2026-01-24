@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/product.dart';
 import '../../data/product_data.dart';
-import '../../services/api/services/products_api_service.dart';
-import '../../services/api/services/wishlist_api_service.dart';
+import '../../services/api/services/product_service.dart';
+import '../../services/api/services/wishlist_service.dart';
 
-/// Set to true to use real API, false for demo mode
-const bool useProductApiMode = false;
+/// Global flag for API mode - can be toggled at runtime
+bool useProductApiMode = true;
 
 /// Product list state for API mode
 class ProductListState {
@@ -40,32 +40,39 @@ class ProductListState {
   }
 }
 
-/// Product notifier for API mode
+/// Product notifier for managing products
 class ProductNotifier extends StateNotifier<ProductListState> {
-  final ProductsApiService _productsService;
+  final ProductService? _productsService;
 
-  ProductNotifier({ProductsApiService? productsService})
-    : _productsService = productsService ?? ProductsApiService(),
+  ProductNotifier({ProductService? productsService})
+    : _productsService = productsService,
       super(const ProductListState(isLoading: true)) {
     _loadProducts();
   }
 
   Future<void> _loadProducts() async {
-    if (useProductApiMode) {
+    if (useProductApiMode && _productsService != null) {
+      // API mode - fetch from backend
       try {
         final response = await _productsService.getProducts();
-        state = ProductListState(
-          products: response.products,
-          isLoading: false,
-          hasMore: response.hasMore,
-          currentPage: response.page,
-        );
+        if (mounted) {
+          state = ProductListState(
+            products: response.products,
+            isLoading: false,
+            hasMore: response.hasMore,
+            currentPage: response.page,
+          );
+        }
       } catch (e) {
-        state = ProductListState(
-          products: ProductData.products, // Fallback to demo data
-          isLoading: false,
-          error: 'Failed to load products',
-        );
+        // Fallback to demo data on API error
+        if (mounted) {
+          state = ProductListState(
+            products: ProductData.products,
+            isLoading: false,
+            hasMore: false,
+            error: e.toString(),
+          );
+        }
       }
     } else {
       // Demo mode - use local data
@@ -86,7 +93,7 @@ class ProductNotifier extends StateNotifier<ProductListState> {
 
     state = state.copyWith(isLoading: true);
 
-    if (useProductApiMode) {
+    if (useProductApiMode && _productsService != null) {
       try {
         final response = await _productsService.getProducts(
           page: state.currentPage + 1,
@@ -113,7 +120,7 @@ class ProductNotifier extends StateNotifier<ProductListState> {
 
   /// Search products
   Future<List<Product>> searchProducts(String query) async {
-    if (useProductApiMode) {
+    if (useProductApiMode && _productsService != null) {
       try {
         final response = await _productsService.searchProducts(query: query);
         return response.products;
@@ -121,7 +128,6 @@ class ProductNotifier extends StateNotifier<ProductListState> {
         // Fallback to local search
       }
     }
-
     // Local search
     final queryLower = query.toLowerCase();
     return state.products.where((p) {
@@ -133,29 +139,26 @@ class ProductNotifier extends StateNotifier<ProductListState> {
 
   /// Get featured products
   Future<List<Product>> getFeaturedProducts() async {
-    if (useProductApiMode) {
+    if (useProductApiMode && _productsService != null) {
       try {
         return await _productsService.getFeaturedProducts();
       } catch (e) {
-        // Fallback to demo data
+        // Fallback to local data
       }
     }
     return state.products.take(6).toList();
   }
 }
 
-/// Product notifier provider (for API mode)
+/// Product notifier provider
 final productNotifierProvider =
     StateNotifierProvider<ProductNotifier, ProductListState>(
       (ref) => ProductNotifier(),
     );
 
-/// Product list provider (works in both modes)
+/// Product list provider
 final productListProvider = Provider<List<Product>>((ref) {
-  if (useProductApiMode) {
-    return ref.watch(productNotifierProvider).products;
-  }
-  return ProductData.products;
+  return ref.watch(productNotifierProvider).products;
 });
 
 /// Product by ID provider
@@ -285,16 +288,16 @@ final productsByCategoryProvider = Provider.family<List<Product>, String>((
 
 /// Favorite products state with API support
 class FavoritesNotifier extends StateNotifier<Set<String>> {
-  final WishlistApiService _wishlistService;
+  final WishlistService? _wishlistService;
 
-  FavoritesNotifier({WishlistApiService? wishlistService})
-    : _wishlistService = wishlistService ?? WishlistApiService(),
+  FavoritesNotifier({WishlistService? wishlistService})
+    : _wishlistService = wishlistService,
       super({}) {
     _loadFavorites();
   }
 
   Future<void> _loadFavorites() async {
-    if (useProductApiMode) {
+    if (useProductApiMode && _wishlistService != null) {
       try {
         final wishlist = await _wishlistService.getWishlist();
         state = wishlist.map((p) => p.id).toSet();
@@ -314,7 +317,7 @@ class FavoritesNotifier extends StateNotifier<Set<String>> {
       state = {...state, productId};
     }
 
-    if (useProductApiMode) {
+    if (useProductApiMode && _wishlistService != null) {
       try {
         if (wasInFavorites) {
           await _wishlistService.removeFromWishlist(productId);

@@ -1,12 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/user.dart';
 import '../../models/shipping_address.dart';
-import '../../services/api/api_exceptions.dart';
-import '../../services/api/services/auth_api_service.dart';
-import '../../services/api/services/addresses_api_service.dart';
+import '../../services/api/services/auth_service.dart';
 
-/// Set to true to use real API, false for demo mode
-const bool useApiMode = false;
+/// Global flag for API mode - can be toggled at runtime
+bool useAuthApiMode = true;
 
 /// Authentication state
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
@@ -33,49 +31,34 @@ class AuthState {
 
 /// Auth notifier for managing authentication state
 class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthApiService _authService;
+  final AuthService? _authService;
 
-  AuthNotifier({AuthApiService? authService})
-    : _authService = authService ?? AuthApiService(),
+  AuthNotifier({AuthService? authService})
+    : _authService = authService,
       super(const AuthState()) {
     _checkAuthStatus();
   }
 
   void _checkAuthStatus() async {
-    if (useApiMode) {
-      // Check if user has valid token
+    if (useAuthApiMode && _authService != null) {
+      // Try to restore session from stored tokens
       try {
-        final isAuth = await _authService.isAuthenticated();
-        if (isAuth) {
-          final user = await _authService.getProfile();
-          state = AuthState(status: AuthStatus.authenticated, user: user);
-        } else {
-          state = const AuthState(status: AuthStatus.unauthenticated);
+        final profile = await _authService.getProfile();
+        if (mounted) {
+          state = AuthState(status: AuthStatus.authenticated, user: profile);
         }
+        return;
       } catch (e) {
+        // Token expired or invalid, continue to unauthenticated
+      }
+    }
+
+    // Demo mode or no valid session - require login
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
         state = const AuthState(status: AuthStatus.unauthenticated);
       }
-    } else {
-      // Demo mode - auto login with demo user
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          state = AuthState(
-            status: AuthStatus.authenticated,
-            user: const User(
-              id: '1',
-              name: 'Olivia',
-              email: 'olivia@gmail.com',
-              phone: '+1 234 567 8900',
-              membershipTier: 'Gold',
-              loyaltyPoints: 2450,
-              totalOrders: 12,
-              totalReviews: 8,
-              walletBalance: 45.50,
-            ),
-          );
-        }
-      });
-    }
+    });
   }
 
   /// Sign in with email and password
@@ -99,7 +82,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       // Real API call
       try {
         final response = await _authService.login(
@@ -111,35 +94,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
           user: response.user,
         );
         return true;
-      } on ApiException catch (e) {
-        state = state.copyWith(status: AuthStatus.error, error: e.message);
-        return false;
       } catch (e) {
-        state = state.copyWith(
-          status: AuthStatus.error,
-          error: 'Login failed. Please try again.',
-        );
+        state = state.copyWith(status: AuthStatus.error, error: e.toString());
         return false;
       }
-    } else {
-      // Demo mode
-      await Future.delayed(const Duration(seconds: 1));
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: User(
-          id: '1',
-          name: email.split('@')[0].capitalize(),
-          email: email,
-          phone: '+1 234 567 8900',
-          membershipTier: 'Bronze',
-          loyaltyPoints: 0,
-          totalOrders: 0,
-          totalReviews: 0,
-          walletBalance: 0.0,
-        ),
-      );
-      return true;
     }
+
+    // Demo mode
+    await Future.delayed(const Duration(seconds: 1));
+    state = AuthState(
+      status: AuthStatus.authenticated,
+      user: User(
+        id: '1',
+        name: email.split('@')[0].capitalize(),
+        email: email,
+        phone: '+1 234 567 8900',
+        membershipTier: 'Bronze',
+        loyaltyPoints: 0,
+        totalOrders: 0,
+        totalReviews: 0,
+        walletBalance: 0.0,
+      ),
+    );
+    return true;
   }
 
   /// Register new user
@@ -184,7 +161,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       // Real API call
       try {
         final response = await _authService.register(
@@ -197,43 +174,37 @@ class AuthNotifier extends StateNotifier<AuthState> {
           user: response.user,
         );
         return true;
-      } on ApiException catch (e) {
-        state = state.copyWith(status: AuthStatus.error, error: e.message);
-        return false;
       } catch (e) {
-        state = state.copyWith(
-          status: AuthStatus.error,
-          error: 'Registration failed. Please try again.',
-        );
+        state = state.copyWith(status: AuthStatus.error, error: e.toString());
         return false;
       }
-    } else {
-      // Demo mode
-      await Future.delayed(const Duration(seconds: 1));
-      state = AuthState(
-        status: AuthStatus.authenticated,
-        user: User(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          name: name,
-          email: email,
-          membershipTier: 'Bronze',
-          loyaltyPoints: 100, // Welcome bonus
-          totalOrders: 0,
-          totalReviews: 0,
-          walletBalance: 0.0,
-        ),
-      );
-      return true;
     }
+
+    // Demo mode
+    await Future.delayed(const Duration(seconds: 1));
+    state = AuthState(
+      status: AuthStatus.authenticated,
+      user: User(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: name,
+        email: email,
+        membershipTier: 'Bronze',
+        loyaltyPoints: 100, // Welcome bonus
+        totalOrders: 0,
+        totalReviews: 0,
+        walletBalance: 0.0,
+      ),
+    );
+    return true;
   }
 
   /// Sign out
   Future<void> signOut() async {
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       try {
         await _authService.logout();
-      } catch (_) {
-        // Ignore errors during logout
+      } catch (e) {
+        // Continue with local signout
       }
     }
     state = const AuthState(status: AuthStatus.unauthenticated);
@@ -248,7 +219,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }) async {
     if (state.user == null) return;
 
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       try {
         final updatedUser = await _authService.updateProfile(
           name: name,
@@ -256,27 +227,36 @@ class AuthNotifier extends StateNotifier<AuthState> {
           phone: phone,
         );
         state = state.copyWith(user: updatedUser);
+        return;
       } catch (e) {
-        // Fallback to local update
-        state = state.copyWith(
-          user: state.user!.copyWith(
-            name: name,
-            email: email,
-            phone: phone,
-            avatarUrl: avatarUrl,
-          ),
-        );
+        // Fall through to local update
       }
-    } else {
-      state = state.copyWith(
-        user: state.user!.copyWith(
-          name: name,
-          email: email,
-          phone: phone,
-          avatarUrl: avatarUrl,
-        ),
-      );
     }
+
+    // Demo mode - update locally
+    state = state.copyWith(
+      user: state.user!.copyWith(
+        name: name,
+        email: email,
+        phone: phone,
+        avatarUrl: avatarUrl,
+      ),
+    );
+  }
+
+  /// Request password reset
+  Future<bool> requestPasswordReset(String email) async {
+    if (useAuthApiMode && _authService != null) {
+      try {
+        await _authService.forgotPassword(email);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    // Demo mode - always succeed
+    await Future.delayed(const Duration(seconds: 1));
+    return true;
   }
 
   /// Clear error
@@ -335,75 +315,68 @@ class AddressListState {
 
 /// Address notifier for managing shipping addresses
 class AddressNotifier extends StateNotifier<AddressListState> {
-  final AddressesApiService _addressService;
+  final AuthService? _authService;
 
-  AddressNotifier({AddressesApiService? addressService})
-    : _addressService = addressService ?? AddressesApiService(),
+  AddressNotifier({AuthService? authService})
+    : _authService = authService,
       super(const AddressListState(isLoading: true)) {
     _loadAddresses();
   }
 
   Future<void> _loadAddresses() async {
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       try {
-        final addresses = await _addressService.getAddresses();
+        final addresses = await _authService.getAddresses();
         state = AddressListState(addresses: addresses, isLoading: false);
+        return;
       } catch (e) {
         state = AddressListState(
           isLoading: false,
           error: 'Failed to load addresses',
         );
+        return;
       }
-    } else {
-      // Demo mode
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          state = AddressListState(
-            addresses: const [
-              ShippingAddress(
-                id: '1',
-                name: 'Home',
-                street: '123 Main Street',
-                city: 'New York',
-                state: 'NY',
-                zipCode: '10001',
-                country: 'USA',
-                phone: '+1 234 567 8900',
-                isDefault: true,
-              ),
-              ShippingAddress(
-                id: '2',
-                name: 'Office',
-                street: '456 Business Ave',
-                city: 'New York',
-                state: 'NY',
-                zipCode: '10002',
-                country: 'USA',
-                phone: '+1 234 567 8901',
-                isDefault: false,
-              ),
-            ],
-            isLoading: false,
-          );
-        }
-      });
     }
+
+    // Demo mode
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        state = AddressListState(
+          addresses: const [
+            ShippingAddress(
+              id: '1',
+              name: 'Home',
+              street: '123 Main Street',
+              city: 'New York',
+              state: 'NY',
+              zipCode: '10001',
+              country: 'USA',
+              phone: '+1 234 567 8900',
+              isDefault: true,
+            ),
+            ShippingAddress(
+              id: '2',
+              name: 'Office',
+              street: '456 Business Ave',
+              city: 'New York',
+              state: 'NY',
+              zipCode: '10002',
+              country: 'USA',
+              phone: '+1 234 567 8901',
+              isDefault: false,
+            ),
+          ],
+          isLoading: false,
+        );
+      }
+    });
   }
 
   /// Add new address
   Future<void> addAddress(ShippingAddress address) async {
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       try {
-        final newAddress = await _addressService.addAddress(
-          name: address.name,
-          street: address.street,
-          city: address.city,
-          state: address.state,
-          zipCode: address.zipCode,
-          country: address.country,
-          phone: address.phone,
-          isDefault: address.isDefault,
-        );
+        final newAddress = await _authService.addAddress(address);
 
         List<ShippingAddress> updatedAddresses;
         if (newAddress.isDefault) {
@@ -415,44 +388,36 @@ class AddressNotifier extends StateNotifier<AddressListState> {
         }
         updatedAddresses.add(newAddress);
         state = state.copyWith(addresses: updatedAddresses);
+        return;
       } catch (e) {
         state = state.copyWith(error: 'Failed to add address');
+        return;
       }
-    } else {
-      // Demo mode
-      final newAddress = address.copyWith(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-      );
-
-      List<ShippingAddress> updatedAddresses;
-      if (newAddress.isDefault) {
-        updatedAddresses = state.addresses
-            .map((a) => a.copyWith(isDefault: false))
-            .toList();
-      } else {
-        updatedAddresses = [...state.addresses];
-      }
-
-      updatedAddresses.add(newAddress);
-      state = state.copyWith(addresses: updatedAddresses);
     }
+
+    // Demo mode
+    final newAddress = address.copyWith(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    );
+
+    List<ShippingAddress> updatedAddresses;
+    if (newAddress.isDefault) {
+      updatedAddresses = state.addresses
+          .map((a) => a.copyWith(isDefault: false))
+          .toList();
+    } else {
+      updatedAddresses = [...state.addresses];
+    }
+
+    updatedAddresses.add(newAddress);
+    state = state.copyWith(addresses: updatedAddresses);
   }
 
   /// Update address
   Future<void> updateAddress(ShippingAddress address) async {
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       try {
-        await _addressService.updateAddress(
-          addressId: address.id,
-          name: address.name,
-          street: address.street,
-          city: address.city,
-          state: address.state,
-          zipCode: address.zipCode,
-          country: address.country,
-          phone: address.phone,
-          isDefault: address.isDefault,
-        );
+        await _authService.updateAddress(address);
       } catch (e) {
         // Continue with local update anyway
       }
@@ -476,9 +441,9 @@ class AddressNotifier extends StateNotifier<AddressListState> {
 
   /// Delete address
   Future<void> deleteAddress(String addressId) async {
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       try {
-        await _addressService.deleteAddress(addressId);
+        await _authService.deleteAddress(addressId);
       } catch (e) {
         // Continue with local delete anyway
       }
@@ -498,9 +463,9 @@ class AddressNotifier extends StateNotifier<AddressListState> {
 
   /// Set default address
   Future<void> setDefaultAddress(String addressId) async {
-    if (useApiMode) {
+    if (useAuthApiMode && _authService != null) {
       try {
-        await _addressService.setDefaultAddress(addressId);
+        await _authService.setDefaultAddress(addressId);
       } catch (e) {
         // Continue with local update anyway
       }

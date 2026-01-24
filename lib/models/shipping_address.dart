@@ -24,6 +24,36 @@ class ShippingAddress {
 
   String get fullAddress => '$street, $city, $state $zipCode';
 
+  /// Create from JSON
+  factory ShippingAddress.fromJson(Map<String, dynamic> json) {
+    return ShippingAddress(
+      id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
+      name: json['name'] ?? json['label'] ?? '',
+      street: json['street'] ?? json['address1'] ?? '',
+      city: json['city'] ?? '',
+      state: json['state'] ?? json['province'] ?? '',
+      zipCode: json['zipCode'] ?? json['zip'] ?? json['postalCode'] ?? '',
+      country: json['country'] ?? '',
+      phone: json['phone'],
+      isDefault: json['isDefault'] ?? json['default'] ?? false,
+    );
+  }
+
+  /// Convert to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'street': street,
+      'city': city,
+      'state': state,
+      'zipCode': zipCode,
+      'country': country,
+      if (phone != null) 'phone': phone,
+      'isDefault': isDefault,
+    };
+  }
+
   ShippingAddress copyWith({
     String? id,
     String? name,

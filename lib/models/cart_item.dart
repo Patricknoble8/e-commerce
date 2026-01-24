@@ -16,6 +16,47 @@ class CartItem {
 
   double get totalPrice => product.finalPrice * quantity;
 
+  /// Create from JSON (API response)
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
+      product: json['product'] is Map<String, dynamic>
+          ? Product.fromJson(json['product'])
+          : Product(
+              id: json['productId']?.toString() ?? '',
+              name: json['name'] ?? json['productName'] ?? '',
+              description: json['description'] ?? '',
+              price: (json['price'] ?? 0).toDouble(),
+              brand: json['brand'] ?? '',
+              category: ProductCategory.clothing, // Default category
+              imageUrl: json['image'] ?? json['imageUrl'] ?? '',
+              availableColors: [],
+              availableSizes: [],
+              rating: 0,
+              reviewCount: 0,
+            ),
+      quantity: json['quantity'] ?? 1,
+      selectedColor: json['selectedColor'] ?? json['color'] ?? '',
+      selectedSize: json['selectedSize'] ?? json['size'] ?? 0,
+    );
+  }
+
+  /// Convert to JSON (for API requests)
+  Map<String, dynamic> toJson() {
+    return {
+      'productId': product.id,
+      'quantity': quantity,
+      'selectedColor': selectedColor,
+      'selectedSize': selectedSize,
+      'price': product.finalPrice,
+    };
+  }
+
+  /// Convenience getters for API compatibility
+  String get productId => product.id;
+  String? get size => selectedSize.toString();
+  String? get color => selectedColor;
+  double get price => product.finalPrice;
+
   CartItem copyWith({
     Product? product,
     int? quantity,

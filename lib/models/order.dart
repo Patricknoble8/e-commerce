@@ -72,6 +72,90 @@ class Order {
     this.promoCode,
   });
 
+  /// Create from JSON (API response)
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
+      orderNumber: json['orderNumber'] ?? json['order_number'] ?? '',
+      items:
+          (json['items'] as List?)
+              ?.map((item) => CartItem.fromJson(item))
+              .toList() ??
+          [],
+      subtotal: (json['subtotal'] ?? 0).toDouble(),
+      shippingCost: (json['shippingCost'] ?? json['shipping'] ?? 0).toDouble(),
+      tax: (json['tax'] ?? 0).toDouble(),
+      discount: (json['discount'] ?? 0).toDouble(),
+      total: (json['total'] ?? 0).toDouble(),
+      status: _parseOrderStatus(json['status']),
+      shippingAddress: json['shippingAddress'] != null
+          ? ShippingAddress.fromJson(json['shippingAddress'])
+          : ShippingAddress(
+              id: '',
+              name: '',
+              street: json['address'] ?? '',
+              city: '',
+              state: '',
+              zipCode: '',
+              country: '',
+            ),
+      paymentMethod: json['paymentMethod'] ?? json['payment_method'] ?? '',
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      estimatedDelivery: json['estimatedDelivery'] != null
+          ? DateTime.parse(json['estimatedDelivery'])
+          : null,
+      deliveredAt: json['deliveredAt'] != null
+          ? DateTime.parse(json['deliveredAt'])
+          : null,
+      trackingNumber: json['trackingNumber'],
+      carrierName: json['carrierName'] ?? json['carrier'],
+      timeline:
+          (json['timeline'] as List?)
+              ?.map(
+                (e) => OrderTimelineEvent(
+                  title: e['title'] ?? '',
+                  description: e['description'] ?? '',
+                  timestamp: e['timestamp'] != null
+                      ? DateTime.parse(e['timestamp'])
+                      : DateTime.now(),
+                  status: _parseOrderStatus(e['status']),
+                  isCompleted: e['isCompleted'] ?? false,
+                ),
+              )
+              .toList() ??
+          [],
+      promoCode: json['promoCode'],
+    );
+  }
+
+  /// Parse order status from string
+  static OrderStatus _parseOrderStatus(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return OrderStatus.pending;
+      case 'confirmed':
+        return OrderStatus.confirmed;
+      case 'processing':
+        return OrderStatus.processing;
+      case 'shipped':
+        return OrderStatus.shipped;
+      case 'out_for_delivery':
+      case 'outfordelivery':
+        return OrderStatus.outForDelivery;
+      case 'delivered':
+        return OrderStatus.delivered;
+      case 'cancelled':
+      case 'canceled':
+        return OrderStatus.cancelled;
+      case 'returned':
+        return OrderStatus.returned;
+      default:
+        return OrderStatus.pending;
+    }
+  }
+
   /// Get the number of items in this order
   int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
 

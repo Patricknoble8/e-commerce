@@ -9,6 +9,9 @@ import 'package:e_commerce/main.dart';
 import 'package:e_commerce/providers/notifiers/cart_notifier.dart';
 import 'package:e_commerce/providers/api_providers.dart';
 import 'package:e_commerce/providers/notifiers/product_notifier.dart';
+import 'package:e_commerce/screens/auth/login_screen.dart';
+import 'package:e_commerce/screens/auth/register_screen.dart';
+import 'package:e_commerce/screens/home/home_screen.dart';
 import 'package:e_commerce/models/product.dart';
 import 'package:e_commerce/data/product_data.dart';
 
@@ -20,8 +23,9 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: MyApp()));
       await tester.pumpAndSettle();
 
-      // Verify the app launches - look for common elements
-      expect(find.byType(Scaffold), findsWidgets);
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(LoginScreen), findsNothing);
+      expect(find.byType(RegisterScreen), findsNothing);
     });
 
     testWidgets('App has proper MaterialApp structure', (

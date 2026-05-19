@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/theme/theme.dart';
 import 'providers/notifiers/theme_notifier.dart';
-import 'providers/notifiers/auth_notifier.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/cart/cart_screen.dart';
 import 'screens/profile/profile_screen.dart';
@@ -23,7 +22,6 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
-    final authState = ref.watch(authProvider);
 
     return MaterialApp(
       title: 'E-Commerce',
@@ -31,7 +29,7 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      home: _buildHome(authState),
+      home: const HomeScreen(),
       routes: {
         '/home': (context) => const HomeScreen(),
         '/cart': (context) => const CartScreen(),
@@ -44,20 +42,5 @@ class MyApp extends ConsumerWidget {
         '/settings': (context) => const SettingsScreen(),
       },
     );
-  }
-
-  Widget _buildHome(AuthState authState) {
-    // Show loading while checking auth status
-    if (authState.status == AuthStatus.initial) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    // Show login screen if not authenticated
-    if (authState.status == AuthStatus.unauthenticated) {
-      return const LoginScreen();
-    }
-
-    // Show home screen if authenticated
-    return const HomeScreen();
   }
 }

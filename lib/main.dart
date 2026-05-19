@@ -52,11 +52,6 @@ class MyApp extends ConsumerWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // Always show home screen after startup
-    if (authState.status == AuthStatus.unauthenticated) {
-      return const HomeScreen();
-    }
-
     // Show home screen by default
     return const HomeScreen();
   }

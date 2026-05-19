@@ -57,7 +57,7 @@ class MyApp extends ConsumerWidget {
       return const HomeScreen();
     }
 
-    // Show home screen if authenticated
+    // Show home screen by default
     return const HomeScreen();
   }
 }

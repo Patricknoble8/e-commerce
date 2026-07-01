@@ -48,9 +48,7 @@ class InputField extends StatelessWidget {
           keyboardType: keyboardType,
           obscureText: obscureText,
           maxLines: maxLines,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.foreground,
-          ),
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: AppTypography.bodyMedium.copyWith(

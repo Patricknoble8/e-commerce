@@ -242,7 +242,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
             activeTrackColor: _primary,
             inactiveTrackColor: _muted,
             thumbColor: _primary,
-            overlayColor: _primary.withOpacity(0.1),
+            overlayColor: _primary.withValues(alpha: 0.1),
             trackHeight: 4,
             rangeThumbShape: const RoundRangeSliderThumbShape(
               enabledThumbRadius: 10,
@@ -303,7 +303,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isSelected ? _primary.withOpacity(0.05) : _card,
+              color: isSelected ? _primary.withValues(alpha: 0.05) : _card,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected ? _primary : _border,

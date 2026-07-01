@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../config/theme/colors.dart';
 import '../../models/order.dart';
 import '../../providers/notifiers/order_notifier.dart';
+import '../../widgets/common/app_back_button.dart';
 import 'order_detail_screen.dart';
 
 class OrderHistoryScreen extends ConsumerWidget {
@@ -19,10 +20,7 @@ class OrderHistoryScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: const AppBackButton(),
         title: const Text(
           'My Orders',
           style: TextStyle(
@@ -252,7 +250,7 @@ class _OrderCard extends StatelessWidget {
                         child: Image.network(
                           item.product.imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                             Icons.image_not_supported_outlined,
                             color: AppColors.foregroundMuted,
                           ),

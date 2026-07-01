@@ -6,11 +6,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:e_commerce/main.dart';
-import 'package:e_commerce/providers/notifiers/cart_notifier.dart';
+import 'package:e_commerce/config/navigation/app_router.dart';
+import 'package:e_commerce/config/navigation/app_routes.dart';
+import 'package:e_commerce/screens/auth/login_screen.dart';
+import 'package:e_commerce/screens/auth/register_screen.dart';
+import 'package:e_commerce/screens/home/home_screen.dart';
+import 'package:e_commerce/providers/notifiers/auth_notifier.dart';
 import 'package:e_commerce/providers/api_providers.dart';
 import 'package:e_commerce/providers/notifiers/product_notifier.dart';
 import 'package:e_commerce/models/product.dart';
 import 'package:e_commerce/data/product_data.dart';
+import 'package:e_commerce/utils/validators.dart';
 
 void main() {
   group('App Launch Tests', () {
@@ -20,8 +26,8 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: MyApp()));
       await tester.pumpAndSettle();
 
-      // Verify the app launches - look for common elements
-      expect(find.byType(Scaffold), findsWidgets);
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(LoginScreen), findsNothing);
     });
 
     testWidgets('App has proper MaterialApp structure', (
@@ -30,6 +36,62 @@ void main() {
       await tester.pumpWidget(const ProviderScope(child: MyApp()));
 
       expect(find.byType(MaterialApp), findsOneWidget);
+    });
+
+    testWidgets('Login screen does not offer social sign-in', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const ProviderScope(child: MaterialApp(home: LoginScreen())),
+      );
+
+      expect(find.text('Google'), findsNothing);
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('Facebook'), findsNothing);
+      expect(find.text('or continue with'), findsNothing);
+    });
+
+    testWidgets('Registration does not offer unfinished social sign-up', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const ProviderScope(child: MaterialApp(home: RegisterScreen())),
+      );
+
+      expect(find.text('Google'), findsNothing);
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('or sign up with'), findsNothing);
+    });
+
+    testWidgets('Protected routes redirect guests to login', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            initialRoute: AppRoutes.profile,
+            onGenerateRoute: (settings) => AppRouter.onGenerateRoute(
+              settings,
+              const AuthState(status: AuthStatus.unauthenticated),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(LoginScreen), findsOneWidget);
+      expect(find.byType(HomeScreen), findsNothing);
+    });
+  });
+
+  group('Form Validation Tests', () {
+    test('Email validation rejects malformed addresses', () {
+      expect(AppValidators.email('invalid-email'), isNotNull);
+      expect(AppValidators.email('customer@example.com'), isNull);
+    });
+
+    test('Strong password requires mixed character classes', () {
+      expect(AppValidators.strongPassword('password'), isNotNull);
+      expect(AppValidators.strongPassword('Strong#123'), isNull);
     });
   });
 

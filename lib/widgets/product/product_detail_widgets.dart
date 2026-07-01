@@ -154,7 +154,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
                     itemCount: images.length,
-                    separatorBuilder: (_, __) => SizedBox(width: AppSpacing.xs),
+                    separatorBuilder: (_, _) => SizedBox(width: AppSpacing.xs),
                     itemBuilder: (context, index) {
                       final isSelected = index == _currentIndex;
                       return GestureDetector(
@@ -208,7 +208,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
       return Image.asset(
         imageUrl,
         fit: fit,
-        errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+        errorBuilder: (_, _, _) => _buildImagePlaceholder(),
       );
     } else {
       return Image.network(
@@ -225,7 +225,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
             ),
           );
         },
-        errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+        errorBuilder: (_, _, _) => _buildImagePlaceholder(),
       );
     }
   }
@@ -281,7 +281,7 @@ class StockIndicator extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Row(
@@ -432,7 +432,7 @@ class EnhancedColorSelector extends StatelessWidget {
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             blurRadius: 8,
                             spreadRadius: 1,
                           ),
@@ -622,7 +622,7 @@ class StickyAddToCartButton extends StatelessWidget {
         border: Border(top: BorderSide(color: AppColors.border)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: Offset(0, -5),
           ),

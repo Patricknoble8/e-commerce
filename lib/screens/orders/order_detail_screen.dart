@@ -5,9 +5,10 @@ import 'package:intl/intl.dart';
 import '../../config/theme/colors.dart';
 import '../../models/order.dart';
 import '../../providers/notifiers/order_notifier.dart';
-import '../../providers/notifiers/cart_notifier.dart';
 import '../../providers/api_providers.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../cart/cart_screen.dart';
+import '../reviews/write_review_screen.dart';
 import 'contact_support_screen.dart';
 
 class OrderDetailScreen extends ConsumerWidget {
@@ -21,7 +22,10 @@ class OrderDetailScreen extends ConsumerWidget {
 
     if (order == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Order Details')),
+        appBar: AppBar(
+          leading: const AppBackButton(),
+          title: const Text('Order Details'),
+        ),
         body: const Center(child: Text('Order not found')),
       );
     }
@@ -31,10 +35,7 @@ class OrderDetailScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           order.orderNumber,
           style: const TextStyle(
@@ -380,7 +381,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         child: Image.network(
                           item.product.imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, _, _) => const Icon(
                             Icons.image_not_supported_outlined,
                             color: AppColors.foregroundMuted,
                           ),
@@ -593,9 +594,12 @@ class OrderDetailScreen extends ConsumerWidget {
             if (order.status == OrderStatus.delivered) ...[
               ElevatedButton(
                 onPressed: () {
-                  // Navigate to write review
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Write review coming soon!')),
+                  if (order.items.isEmpty) return;
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          WriteReviewScreen(product: order.items.first.product),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(

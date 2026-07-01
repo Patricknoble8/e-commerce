@@ -7,6 +7,7 @@ import '../services/api/services/order_service.dart';
 import '../services/api/services/cart_service.dart';
 import '../services/api/services/wishlist_service.dart';
 import 'notifiers/cart_notifier.dart';
+import 'notifiers/auth_notifier.dart';
 import 'state/cart_state.dart';
 
 /// ============================================================
@@ -104,7 +105,8 @@ final apiHealthCheckProvider = FutureProvider<bool>((ref) async {
 /// Injects CartService for API integration
 final cartProvider = StateNotifierProvider<CartNotifier, CartState>((ref) {
   final cartService = ref.watch(cartServiceProvider);
-  return CartNotifier(cartService: cartService);
+  final isAuthenticated = ref.watch(isAuthenticatedProvider);
+  return CartNotifier(cartService: isAuthenticated ? cartService : null);
 });
 
 /// Computed providers for specific cart values

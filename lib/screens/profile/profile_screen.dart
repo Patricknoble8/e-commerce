@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/navigation/app_routes.dart';
 import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
+import '../../models/user.dart';
 import '../../providers/notifiers/profile_notifier.dart';
 import '../../providers/notifiers/product_notifier.dart';
 import '../../providers/notifiers/notifications_notifier.dart';
 import '../../providers/notifiers/auth_notifier.dart';
 import '../../widgets/profile/profile_image_picker.dart';
-import '../notifications/notifications_screen.dart';
-import '../settings/settings_screen.dart';
 import '../settings/size_preferences_screen.dart';
 import '../settings/security_settings_screen.dart';
 import '../settings/notification_preferences_screen.dart';
 import '../settings/returns_refunds_screen.dart';
-import '../auth/login_screen.dart';
+import '../orders/contact_support_screen.dart';
 import 'edit_profile_screen.dart';
 import '../settings/address_management_screen.dart';
 
@@ -43,12 +43,8 @@ class ProfileScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             color: AppColors.foreground,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
+            tooltip: 'Settings',
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.settings),
           ),
         ],
       ),
@@ -76,7 +72,7 @@ class ProfileScreen extends ConsumerWidget {
                   ? '$activeOrders active orders'
                   : 'View your past orders',
               onTap: () {
-                Navigator.pushNamed(context, '/orders');
+                Navigator.pushNamed(context, AppRoutes.orders);
               },
               badge: activeOrders > 0 ? activeOrders.toString() : null,
             ),
@@ -85,7 +81,7 @@ class ProfileScreen extends ConsumerWidget {
               title: 'Wishlist',
               subtitle: '$favoriteCount saved items',
               onTap: () {
-                Navigator.pushNamed(context, '/wishlist');
+                Navigator.pushNamed(context, AppRoutes.wishlist);
               },
               badge: favoriteCount > 0 ? favoriteCount.toString() : null,
             ),
@@ -107,7 +103,7 @@ class ProfileScreen extends ConsumerWidget {
               title: 'Payment Methods',
               subtitle: '${paymentMethods.length} saved methods',
               onTap: () {
-                Navigator.pushNamed(context, '/payment-methods');
+                Navigator.pushNamed(context, AppRoutes.paymentMethods);
               },
             ),
             _MenuItem(
@@ -122,48 +118,6 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 );
               },
-            ),
-            SizedBox(height: AppSpacing.lg),
-
-            // Rewards & Loyalty Section
-            _SectionHeader(title: 'Rewards & Loyalty'),
-            _MenuItem(
-              icon: Icons.stars_outlined,
-              title: 'Loyalty Points',
-              subtitle: '${user.loyaltyPoints} points available',
-              onTap: () {},
-              trailing: Text(
-                '${user.loyaltyPoints} pts',
-                style: AppTypography.labelLarge.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: AppTypography.semiBold,
-                ),
-              ),
-            ),
-            _MenuItem(
-              icon: Icons.card_giftcard_outlined,
-              title: 'Coupons & Vouchers',
-              subtitle: 'View available discounts',
-              onTap: () {},
-            ),
-            _MenuItem(
-              icon: Icons.account_balance_wallet_outlined,
-              title: 'Wallet',
-              subtitle: 'Balance: \$${user.walletBalance.toStringAsFixed(2)}',
-              onTap: () {},
-              trailing: Text(
-                '\$${user.walletBalance.toStringAsFixed(2)}',
-                style: AppTypography.labelLarge.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: AppTypography.semiBold,
-                ),
-              ),
-            ),
-            _MenuItem(
-              icon: Icons.share_outlined,
-              title: 'Refer & Earn',
-              subtitle: 'Share with friends',
-              onTap: () {},
             ),
             SizedBox(height: AppSpacing.lg),
 
@@ -189,22 +143,11 @@ class ProfileScreen extends ConsumerWidget {
                   ? '$unreadNotifications unread messages'
                   : 'Manage notifications',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationsScreen(),
-                  ),
-                );
+                Navigator.pushNamed(context, AppRoutes.notifications);
               },
               badge: unreadNotifications > 0
                   ? unreadNotifications.toString()
                   : null,
-            ),
-            _MenuItem(
-              icon: Icons.language_outlined,
-              title: 'Language',
-              subtitle: 'English',
-              onTap: () {},
             ),
             _MenuItem(
               icon: Icons.email_outlined,
@@ -236,46 +179,22 @@ class ProfileScreen extends ConsumerWidget {
                 );
               },
             ),
-            _MenuItem(
-              icon: Icons.privacy_tip_outlined,
-              title: 'Privacy Policy',
-              subtitle: 'Read our privacy policy',
-              onTap: () {},
-            ),
-            _MenuItem(
-              icon: Icons.description_outlined,
-              title: 'Terms & Conditions',
-              subtitle: 'Read our terms',
-              onTap: () {},
-            ),
-            _MenuItem(
-              icon: Icons.delete_outline,
-              title: 'Delete Account',
-              subtitle: 'Permanently delete your account',
-              onTap: () {},
-              isDestructive: true,
-            ),
             SizedBox(height: AppSpacing.lg),
 
             // Support Section
             _SectionHeader(title: 'Support'),
             _MenuItem(
-              icon: Icons.help_outline,
-              title: 'FAQ',
-              subtitle: 'Frequently asked questions',
-              onTap: () {},
-            ),
-            _MenuItem(
               icon: Icons.support_agent_outlined,
               title: 'Contact Us',
               subtitle: 'Get in touch with support',
-              onTap: () {},
-            ),
-            _MenuItem(
-              icon: Icons.headset_mic_outlined,
-              title: 'Get Help',
-              subtitle: 'Chat with support',
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ContactSupportScreen(),
+                  ),
+                );
+              },
             ),
             SizedBox(height: AppSpacing.xl),
 
@@ -342,13 +261,14 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ),
           TextButton(
-            onPressed: () {
-              ref.read(authProvider.notifier).signOut();
+            onPressed: () async {
+              await ref.read(authProvider.notifier).signOut();
+              if (!context.mounted) return;
               Navigator.pop(context);
-              Navigator.pushAndRemoveUntil(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (route) => false,
+                AppRoutes.home,
+                (_) => false,
               );
             },
             child: Text(
@@ -365,7 +285,7 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 class _ProfileHeader extends StatelessWidget {
-  final user;
+  final User user;
 
   const _ProfileHeader({required this.user});
 
@@ -408,12 +328,12 @@ class _ProfileHeader extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: _getMembershipColor(
                           user.membershipTier,
-                        ).withOpacity(0.1),
+                        ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(AppRadius.sm),
                         border: Border.all(
                           color: _getMembershipColor(
                             user.membershipTier,
-                          ).withOpacity(0.3),
+                          ).withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
@@ -582,18 +502,14 @@ class _MenuItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final Widget? trailing;
   final String? badge;
-  final bool isDestructive;
 
   const _MenuItem({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.trailing,
     this.badge,
-    this.isDestructive = false,
   });
 
   @override
@@ -617,27 +533,17 @@ class _MenuItem extends StatelessWidget {
         leading: Container(
           padding: EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
-            color: isDestructive
-                ? AppColors.destructive.withOpacity(0.1)
-                : AppColors.muted,
+            color: AppColors.muted,
             borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: isDestructive
-                ? AppColors.destructive
-                : AppColors.foregroundSecondary,
-          ),
+          child: Icon(icon, size: 20, color: AppColors.foregroundSecondary),
         ),
         title: Row(
           children: [
             Text(
               title,
               style: AppTypography.bodyMedium.copyWith(
-                color: isDestructive
-                    ? AppColors.destructive
-                    : AppColors.foreground,
+                color: AppColors.foreground,
                 fontWeight: AppTypography.medium,
               ),
             ),
@@ -672,13 +578,11 @@ class _MenuItem extends StatelessWidget {
             ),
           ),
         ),
-        trailing:
-            trailing ??
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.foregroundSecondary,
-              size: 20,
-            ),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: AppColors.foregroundSecondary,
+          size: 20,
+        ),
       ),
     );
   }

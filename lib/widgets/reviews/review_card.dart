@@ -212,7 +212,7 @@ class _ReviewCardState extends State<ReviewCard>
               child: Image.network(
                 widget.review.userAvatarUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildAvatarFallback(),
+                errorBuilder: (_, _, _) => _buildAvatarFallback(),
               ),
             )
           : _buildAvatarFallback(),
@@ -237,7 +237,7 @@ class _ReviewCardState extends State<ReviewCard>
     return Container(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.success.withOpacity(0.1),
+        color: AppColors.success.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Row(
@@ -323,7 +323,7 @@ class _ReviewCardState extends State<ReviewCard>
       scale: _helpfulScaleAnimation,
       child: Material(
         color: hasMarkedHelpful
-            ? AppColors.primary.withOpacity(0.1)
+            ? AppColors.primary.withValues(alpha: 0.1)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadius.md),
         child: InkWell(
@@ -408,7 +408,7 @@ class ReviewImageThumbnails extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: displayCount,
-        separatorBuilder: (_, __) => SizedBox(width: AppSpacing.xs),
+        separatorBuilder: (_, _) => SizedBox(width: AppSpacing.xs),
         itemBuilder: (context, index) {
           final isLast = index == maxDisplay - 1 && remaining > 0;
 
@@ -429,7 +429,7 @@ class ReviewImageThumbnails extends StatelessWidget {
                     Image.network(
                       images[index],
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         color: AppColors.backgroundMuted,
                         child: Icon(
                           Icons.image_not_supported_outlined,

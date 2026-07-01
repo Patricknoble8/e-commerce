@@ -9,6 +9,7 @@ import '../../models/product.dart';
 import '../../providers/providers.dart';
 import '../../widgets/reviews/reviews.dart';
 import '../../widgets/common/shimmer_loading.dart';
+import '../../widgets/common/app_back_button.dart';
 import 'write_review_screen.dart';
 
 /// Screen showing all reviews for a product
@@ -35,6 +36,7 @@ class _ProductReviewsScreenState extends ConsumerState<ProductReviewsScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
+        leading: const AppBackButton(),
         title: Text('Reviews', style: AppTypography.h4),
         actions: [
           IconButton(
@@ -47,9 +49,9 @@ class _ProductReviewsScreenState extends ConsumerState<ProductReviewsScreen> {
       body: reviewState.isLoading
           ? _buildLoadingState()
           : RefreshIndicator(
-              onRefresh: () async {
-                // Simulate refresh
-                await Future.delayed(const Duration(seconds: 1));
+              onRefresh: () {
+                ref.invalidate(reviewProvider);
+                return Future<void>.value();
               },
               child: CustomScrollView(
                 slivers: [
@@ -374,18 +376,20 @@ class _ReportReviewBottomSheetState extends State<ReportReviewBottomSheet> {
             ),
           ),
           SizedBox(height: AppSpacing.md),
-          ...ReportReason.values.map((reason) {
-            return RadioListTile<ReportReason>(
-              title: Text(reason.label),
-              value: reason,
-              groupValue: _selectedReason,
-              onChanged: (value) {
-                setState(() => _selectedReason = value);
-              },
-              contentPadding: EdgeInsets.zero,
-              visualDensity: VisualDensity.compact,
-            );
-          }),
+          RadioGroup<ReportReason>(
+            groupValue: _selectedReason,
+            onChanged: (value) => setState(() => _selectedReason = value),
+            child: Column(
+              children: ReportReason.values.map((reason) {
+                return RadioListTile<ReportReason>(
+                  title: Text(reason.label),
+                  value: reason,
+                  contentPadding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                );
+              }).toList(),
+            ),
+          ),
           SizedBox(height: AppSpacing.md),
           SizedBox(
             width: double.infinity,

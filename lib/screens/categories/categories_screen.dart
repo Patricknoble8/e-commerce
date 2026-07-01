@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../data/category_data.dart';
 import '../../models/category.dart';
+import '../../widgets/common/app_back_button.dart';
 import 'category_products_screen.dart';
 
 /// Professional Categories Screen - shadcn/ui inspired design
@@ -54,9 +55,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
       leading: _selectedMainCategory != null
-          ? IconButton(
+          ? AppBackButton(
               onPressed: () {
-                HapticFeedback.lightImpact();
                 setState(() {
                   if (_selectedSubCategory != null) {
                     _selectedSubCategory = null;
@@ -65,19 +65,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   }
                 });
               },
-              icon: Icon(
-                Icons.arrow_back_ios_new,
-                color: _foreground,
-                size: 20,
-              ),
+              foregroundColor: _foreground,
+              backgroundColor: _card,
             )
-          : IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(
-                Icons.arrow_back_ios_new,
-                color: _foreground,
-                size: 20,
-              ),
+          : const AppBackButton(
+              foregroundColor: _foreground,
+              backgroundColor: _card,
             ),
       title: Text(
         _selectedSubCategory?.name ??
@@ -118,7 +111,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         border: Border.all(color: _border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -232,7 +225,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         border: Border.all(color: _border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -248,7 +241,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 _selectedSubCategory = subcategory;
               });
             } else {
-              // Navigate to products or show coming soon
+              // Open the selected product category.
               _showCategoryProducts(subcategory);
             }
           },
@@ -365,7 +358,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Products coming soon',
+              'No products are available in this category yet.',
               style: TextStyle(fontSize: 14, color: _mutedForeground),
               textAlign: TextAlign.center,
             ),
@@ -445,7 +438,7 @@ class CategoryChip extends StatelessWidget {
           border: Border.all(color: isSelected ? _primary : _border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -499,7 +492,7 @@ class CategoryGridItem extends StatelessWidget {
           border: Border.all(color: _border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/navigation/app_routes.dart';
 import '../../providers/providers.dart';
 
 /// Professional app drawer with shadcn/ui styling
@@ -54,7 +55,7 @@ class AppDrawer extends ConsumerWidget {
                     label: 'Categories',
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.pushNamed(context, '/categories');
+                      Navigator.pushNamed(context, AppRoutes.categories);
                     },
                   ),
                   _buildMenuItem(
@@ -64,7 +65,7 @@ class AppDrawer extends ConsumerWidget {
                     badge: cartItemCount > 0 ? cartItemCount.toString() : null,
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.pushNamed(context, '/cart');
+                      Navigator.pushNamed(context, AppRoutes.cart);
                     },
                   ),
                   _buildMenuItem(
@@ -76,19 +77,9 @@ class AppDrawer extends ConsumerWidget {
                         : null,
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.pushNamed(context, '/wishlist');
+                      Navigator.pushNamed(context, AppRoutes.wishlist);
                     },
                   ),
-                  _buildMenuItem(
-                    context,
-                    icon: Icons.local_offer_rounded,
-                    label: 'Offers & Deals',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showComingSoon(context, 'Offers & Deals');
-                    },
-                  ),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -103,7 +94,7 @@ class AppDrawer extends ConsumerWidget {
                     label: 'My Profile',
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.pushNamed(context, '/profile');
+                      Navigator.pushNamed(context, AppRoutes.profile);
                     },
                   ),
                   _buildMenuItem(
@@ -112,7 +103,7 @@ class AppDrawer extends ConsumerWidget {
                     label: 'Order History',
                     onTap: () {
                       Navigator.pop(context);
-                      _showComingSoon(context, 'Order History');
+                      Navigator.pushNamed(context, AppRoutes.orders);
                     },
                   ),
                   _buildMenuItem(
@@ -121,7 +112,7 @@ class AppDrawer extends ConsumerWidget {
                     label: 'Payment Methods',
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.pushNamed(context, '/payment-methods');
+                      Navigator.pushNamed(context, AppRoutes.paymentMethods);
                     },
                   ),
                   _buildMenuItem(
@@ -130,7 +121,7 @@ class AppDrawer extends ConsumerWidget {
                     label: 'Addresses',
                     onTap: () {
                       Navigator.pop(context);
-                      _showComingSoon(context, 'Addresses');
+                      Navigator.pushNamed(context, AppRoutes.addresses);
                     },
                   ),
 
@@ -144,20 +135,11 @@ class AppDrawer extends ConsumerWidget {
 
                   _buildMenuItem(
                     context,
-                    icon: Icons.help_outline_rounded,
-                    label: 'Help & Support',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showComingSoon(context, 'Help & Support');
-                    },
-                  ),
-                  _buildMenuItem(
-                    context,
                     icon: Icons.settings_rounded,
                     label: 'Settings',
                     onTap: () {
                       Navigator.pop(context);
-                      _showComingSoon(context, 'Settings');
+                      Navigator.pushNamed(context, AppRoutes.settings);
                     },
                   ),
                 ],
@@ -165,7 +147,7 @@ class AppDrawer extends ConsumerWidget {
             ),
 
             // Footer
-            _buildFooter(context),
+            _buildFooter(context, ref),
           ],
         ),
       ),
@@ -228,7 +210,7 @@ class AppDrawer extends ConsumerWidget {
             onPressed: () {
               HapticFeedback.lightImpact();
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/profile');
+              Navigator.pushNamed(context, AppRoutes.profile);
             },
             icon: Icon(Icons.edit_rounded, color: _mutedForeground, size: 20),
             style: IconButton.styleFrom(
@@ -317,7 +299,7 @@ class AppDrawer extends ConsumerWidget {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
+  Widget _buildFooter(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -362,7 +344,7 @@ class AppDrawer extends ConsumerWidget {
             child: OutlinedButton.icon(
               onPressed: () {
                 HapticFeedback.lightImpact();
-                _showLogoutDialog(context);
+                _showLogoutDialog(context, ref);
               },
               icon: Icon(Icons.logout_rounded, size: 18, color: _destructive),
               label: Text(
@@ -395,29 +377,12 @@ class AppDrawer extends ConsumerWidget {
     return name[0].toUpperCase();
   }
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.info_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Text('$feature coming soon!'),
-          ],
-        ),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: _primary,
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: _card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
@@ -434,7 +399,7 @@ class AppDrawer extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'Cancel',
               style: TextStyle(
@@ -444,11 +409,12 @@ class AppDrawer extends ConsumerWidget {
             ),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-              // TODO: Implement actual logout logic
-              ScaffoldMessenger.of(context).showSnackBar(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              navigator.pop();
+              await ref.read(authProvider.notifier).signOut();
+              navigator.pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
+              messenger.showSnackBar(
                 SnackBar(
                   content: const Text('Signed out successfully'),
                   behavior: SnackBarBehavior.floating,

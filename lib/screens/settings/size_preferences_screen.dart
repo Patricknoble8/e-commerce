@@ -5,6 +5,7 @@ import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
 import '../../widgets/buttons/buttons.dart';
+import '../../widgets/common/app_back_button.dart';
 
 /// Provider for size preferences
 final sizePreferencesProvider =
@@ -94,23 +95,6 @@ class SizePreferencesScreen extends ConsumerWidget {
     '14',
   ];
 
-  static const List<String> _usShoesWomen = [
-    '5',
-    '5.5',
-    '6',
-    '6.5',
-    '7',
-    '7.5',
-    '8',
-    '8.5',
-    '9',
-    '9.5',
-    '10',
-    '10.5',
-    '11',
-    '12',
-  ];
-
   static const List<String> _euShoes = [
     '35',
     '36',
@@ -161,10 +145,7 @@ class SizePreferencesScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Size Preferences',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -203,9 +184,11 @@ class SizePreferencesScreen extends ConsumerWidget {
             Container(
               padding: EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.05),
+                color: AppColors.primary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                ),
               ),
               child: Row(
                 children: [

@@ -163,7 +163,7 @@ class ProductCard extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(AppSpacing.xs),
                     decoration: BoxDecoration(
-                      color: AppColors.background.withOpacity(0.9),
+                      color: AppColors.background.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(AppRadius.full),
                       border: Border.all(
                         color: AppColors.border,

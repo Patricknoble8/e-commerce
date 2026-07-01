@@ -7,6 +7,7 @@ import '../../config/theme/typography.dart';
 import '../../models/product.dart';
 import '../../models/review.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../../widgets/reviews/reviews.dart';
 import '../../widgets/product/product_detail_widgets.dart';
 import '../../providers/providers.dart';
@@ -72,10 +73,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     setState(() => _isAddingToCart = true);
     HapticFeedback.mediumImpact();
 
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    ref
+    await ref
         .read(cartProvider.notifier)
         .addToCart(widget.product, _selectedColor!, _selectedSize);
 
@@ -268,17 +266,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
       backgroundColor: AppColors.background,
       elevation: 0,
       pinned: true,
-      leading: IconButton(
-        icon: Container(
-          padding: EdgeInsets.all(AppSpacing.xs),
-          decoration: BoxDecoration(
-            color: AppColors.background.withOpacity(0.9),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.arrow_back, color: AppColors.foreground),
-        ),
-        onPressed: () => Navigator.pop(context),
-      ),
+      leading: const AppBackButton(),
       title: Text(
         'Product Details',
         style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -288,7 +276,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
           icon: Container(
             padding: EdgeInsets.all(AppSpacing.xs),
             decoration: BoxDecoration(
-              color: AppColors.background.withOpacity(0.9),
+              color: AppColors.background.withValues(alpha: 0.9),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.share_outlined, color: AppColors.foreground),
@@ -305,7 +293,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
               icon: Container(
                 padding: EdgeInsets.all(AppSpacing.xs),
                 decoration: BoxDecoration(
-                  color: AppColors.background.withOpacity(0.9),
+                  color: AppColors.background.withValues(alpha: 0.9),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.favorite_border, color: AppColors.foreground),

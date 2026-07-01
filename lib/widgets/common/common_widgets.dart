@@ -130,11 +130,7 @@ class ColorSelector extends StatelessWidget {
           ),
         ),
         child: isSelected
-            ? const Icon(
-                Icons.check,
-                size: 18,
-                color: Colors.white,
-              )
+            ? const Icon(Icons.check, size: 18, color: Colors.white)
             : null,
       ),
     );

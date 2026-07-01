@@ -1,17 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/notifiers/theme_notifier.dart';
+import '../../widgets/common/app_back_button.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool _pushNotifications = true;
+  bool _orderUpdates = true;
+  bool _promotionalOffers = false;
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        title: const Text('Settings'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -98,14 +111,9 @@ class SettingsScreen extends ConsumerWidget {
                   title: 'Push Notifications',
                   subtitle: 'Receive push notifications',
                   icon: Icons.notifications_outlined,
-                  value: true,
-                  onChanged: (value) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Notification settings coming soon!'),
-                      ),
-                    );
-                  },
+                  value: _pushNotifications,
+                  onChanged: (value) =>
+                      setState(() => _pushNotifications = value),
                 ),
                 Divider(
                   height: 1,
@@ -116,8 +124,8 @@ class SettingsScreen extends ConsumerWidget {
                   title: 'Order Updates',
                   subtitle: 'Get notified about order status',
                   icon: Icons.local_shipping_outlined,
-                  value: true,
-                  onChanged: (value) {},
+                  value: _orderUpdates,
+                  onChanged: (value) => setState(() => _orderUpdates = value),
                 ),
                 Divider(
                   height: 1,
@@ -128,17 +136,18 @@ class SettingsScreen extends ConsumerWidget {
                   title: 'Promotional Offers',
                   subtitle: 'Receive deals and discounts',
                   icon: Icons.local_offer_outlined,
-                  value: false,
-                  onChanged: (value) {},
+                  value: _promotionalOffers,
+                  onChanged: (value) =>
+                      setState(() => _promotionalOffers = value),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
 
-          // Account section
+          // Application section
           Text(
-            'Account',
+            'Application',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -149,36 +158,6 @@ class SettingsScreen extends ConsumerWidget {
           Card(
             child: Column(
               children: [
-                _buildListTile(
-                  context,
-                  title: 'Privacy Policy',
-                  icon: Icons.privacy_tip_outlined,
-                  onTap: () {},
-                ),
-                Divider(
-                  height: 1,
-                  color: colorScheme.outline.withValues(alpha: 0.2),
-                ),
-                _buildListTile(
-                  context,
-                  title: 'Terms of Service',
-                  icon: Icons.description_outlined,
-                  onTap: () {},
-                ),
-                Divider(
-                  height: 1,
-                  color: colorScheme.outline.withValues(alpha: 0.2),
-                ),
-                _buildListTile(
-                  context,
-                  title: 'Help & Support',
-                  icon: Icons.help_outline,
-                  onTap: () {},
-                ),
-                Divider(
-                  height: 1,
-                  color: colorScheme.outline.withValues(alpha: 0.2),
-                ),
                 _buildListTile(
                   context,
                   title: 'About',

@@ -7,6 +7,7 @@ import '../../config/theme/typography.dart';
 import '../../models/shipping_address.dart';
 import '../../providers/notifiers/auth_notifier.dart';
 import '../../widgets/buttons/buttons.dart';
+import '../../widgets/common/app_back_button.dart';
 
 /// Address management screen for managing shipping addresses
 class AddressManagementScreen extends ConsumerWidget {
@@ -22,10 +23,7 @@ class AddressManagementScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Shipping Addresses',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),

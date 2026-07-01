@@ -5,6 +5,7 @@ import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
 import '../../widgets/buttons/buttons.dart';
+import '../../widgets/common/app_back_button.dart';
 
 /// Security settings screen for password and security options
 class SecuritySettingsScreen extends ConsumerStatefulWidget {
@@ -28,10 +29,7 @@ class _SecuritySettingsScreenState
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Security & Password',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -178,7 +176,9 @@ class _SecuritySettingsScreenState
               Container(
                 padding: EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: (iconColor ?? AppColors.primary).withOpacity(0.1),
+                  color: (iconColor ?? AppColors.primary).withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(
@@ -231,7 +231,7 @@ class _SecuritySettingsScreenState
             Container(
               padding: EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(icon, color: AppColors.primary, size: 20),
@@ -259,7 +259,7 @@ class _SecuritySettingsScreenState
             Switch.adaptive(
               value: value,
               onChanged: onChanged,
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
             ),
           ],
         ),
@@ -572,7 +572,7 @@ class _SecuritySettingsScreenState
                 vertical: AppSpacing.xs,
               ),
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.1),
+                color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Text(

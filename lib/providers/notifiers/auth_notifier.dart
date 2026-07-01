@@ -53,12 +53,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
     }
 
-    // Demo mode or no valid session - require login
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        state = const AuthState(status: AuthStatus.unauthenticated);
-      }
-    });
+    if (mounted && state.status == AuthStatus.initial) {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+    }
   }
 
   /// Sign in with email and password
@@ -74,10 +71,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
-    if (password.isEmpty || password.length < 6) {
+    if (password.isEmpty || password.length < 8) {
       state = state.copyWith(
         status: AuthStatus.error,
-        error: 'Password must be at least 6 characters',
+        error: 'Password must be at least 8 characters',
       );
       return false;
     }
@@ -145,10 +142,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return false;
     }
 
-    if (password.isEmpty || password.length < 6) {
+    if (password.isEmpty || password.length < 8) {
       state = state.copyWith(
         status: AuthStatus.error,
-        error: 'Password must be at least 6 characters',
+        error: 'Password must be at least 8 characters',
       );
       return false;
     }

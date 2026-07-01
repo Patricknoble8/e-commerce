@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/navigation/app_routes.dart';
 import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
 import '../../widgets/buttons/buttons.dart';
-import '../../widgets/inputs/inputs.dart';
 import '../../widgets/common/common_widgets.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../../providers/providers.dart';
 import '../../models/cart_item.dart';
-import '../checkout/checkout_screen.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -18,14 +18,6 @@ class CartScreen extends ConsumerStatefulWidget {
 }
 
 class _CartScreenState extends ConsumerState<CartScreen> {
-  final TextEditingController _promoController = TextEditingController();
-
-  @override
-  void dispose() {
-    _promoController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,10 +25,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Cart',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -47,7 +36,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               Icons.notifications_outlined,
               color: AppColors.foreground,
             ),
-            onPressed: () {},
+            tooltip: 'Notifications',
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRoutes.notifications),
           ),
           SizedBox(width: AppSpacing.sm),
         ],
@@ -75,10 +66,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             child: _buildCartItem(item),
                           ),
                         ),
-                        SizedBox(height: AppSpacing.md),
-
-                        // Promo Code
-                        _buildPromoCodeSection(),
                         SizedBox(height: AppSpacing.md),
 
                         // Order Summary
@@ -316,33 +303,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     );
   }
 
-  Widget _buildPromoCodeSection() {
-    return Row(
-      children: [
-        Expanded(
-          child: InputField(placeholder: 'Promo Code', onChanged: (value) {}),
-        ),
-        SizedBox(width: AppSpacing.sm),
-        SizedBox(
-          height: 44,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppRadius.md),
-              ),
-            ),
-            child: const Text('Apply'),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildOrderSummary() {
     final cartState = ref.watch(cartProvider);
 
@@ -413,9 +373,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           child: PrimaryButton(
             text: 'Proceed To Checkout',
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const CheckoutScreen()),
-              );
+              Navigator.of(context).pushNamed(AppRoutes.checkout);
             },
             fullWidth: true,
           ),

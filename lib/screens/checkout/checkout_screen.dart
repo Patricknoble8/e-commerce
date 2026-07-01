@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/navigation/app_routes.dart';
 import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../../widgets/buttons/buttons.dart';
 import '../../providers/providers.dart';
+import '../../models/payment_method.dart';
 import '../../models/shipping_address.dart';
+import '../../utils/validators.dart';
 import '../orders/order_confirmation_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -16,15 +20,21 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 }
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
+  final _shippingFormKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _phoneController = TextEditingController();
   int _currentStep = 0;
   bool _acceptTerms = false;
   bool _isProcessing = false;
   String _selectedShippingMethod = 'standard';
+  String? _selectedPaymentMethodId;
   bool _expandAddressSection = true;
-  bool _expandPromoSection = false;
-  final _promoController = TextEditingController();
-  String? _appliedPromo;
-  double _discountAmount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +46,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Checkout',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -92,7 +99,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         Expanded(
           flex: 1,
           child: Container(
-            color: AppColors.border.withOpacity(0.3),
+            color: AppColors.border.withValues(alpha: 0.3),
             child: SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(AppSpacing.lg),
@@ -200,140 +207,213 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Widget _buildShippingAddressSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Card Header
-        Container(
-          padding: EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            color: AppColors.border.withOpacity(0.05),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.location_on,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: AppSpacing.md),
-                  Text(
-                    'Shipping Address',
-                    style: AppTypography.h4.copyWith(
-                      color: AppColors.foreground,
-                    ),
-                  ),
-                ],
-              ),
-              IconButton(
-                icon: Icon(
-                  _expandAddressSection ? Icons.expand_less : Icons.expand_more,
-                  color: AppColors.foregroundSecondary,
-                ),
-                onPressed: () {
-                  setState(
-                    () => _expandAddressSection = !_expandAddressSection,
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-
-        if (_expandAddressSection)
+    return Form(
+      key: _shippingFormKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Card Header
           Container(
-            padding: EdgeInsets.all(AppSpacing.lg),
+            padding: EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.border),
               borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(12),
+                top: Radius.circular(12),
               ),
+              color: AppColors.border.withValues(alpha: 0.05),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTextField(
-                  label: 'Full Name',
-                  hint: 'Enter your full name',
-                  icon: Icons.person_outline,
-                ),
-                SizedBox(height: AppSpacing.md),
-
-                _buildTextField(
-                  label: 'Email Address',
-                  hint: 'your.email@example.com',
-                  icon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: AppSpacing.md),
-
-                _buildTextField(
-                  label: 'Street Address',
-                  hint: 'Enter your street address',
-                  icon: Icons.home_outlined,
-                ),
-                SizedBox(height: AppSpacing.md),
-
                 Row(
                   children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'City',
-                        hint: 'City',
-                        icon: Icons.location_city_outlined,
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.location_on,
+                          color: Colors.white,
+                          size: 16,
+                        ),
                       ),
                     ),
                     SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: _buildTextField(label: 'State', hint: 'State'),
-                    ),
-                  ],
-                ),
-                SizedBox(height: AppSpacing.md),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'ZIP Code',
-                        hint: 'Enter ZIP code',
-                      ),
-                    ),
-                    SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: _buildTextField(
-                        label: 'Phone',
-                        hint: '+1 (555) 000-0000',
-                        keyboardType: TextInputType.phone,
+                    Text(
+                      'Shipping Address',
+                      style: AppTypography.h4.copyWith(
+                        color: AppColors.foreground,
                       ),
                     ),
                   ],
                 ),
-
-                SizedBox(height: AppSpacing.lg),
-                _buildInfoBanner(
-                  'Measure your address is correct.',
-                  Icons.info_outline,
+                IconButton(
+                  icon: Icon(
+                    _expandAddressSection
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                    color: AppColors.foregroundSecondary,
+                  ),
+                  onPressed: () {
+                    setState(
+                      () => _expandAddressSection = !_expandAddressSection,
+                    );
+                  },
                 ),
               ],
             ),
           ),
-      ],
+
+          if (_expandAddressSection)
+            Container(
+              padding: EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.border),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(12),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTextField(
+                    label: 'Full Name',
+                    hint: 'Enter your full name',
+                    icon: Icons.person_outline,
+                    controller: _nameController,
+                    autofillHints: const [AutofillHints.name],
+                    textInputAction: TextInputAction.next,
+                    validator: (value) => AppValidators.requiredText(
+                      value,
+                      fieldName: 'Full name',
+                      minimumLength: 2,
+                    ),
+                  ),
+                  SizedBox(height: AppSpacing.md),
+
+                  _buildTextField(
+                    label: 'Email Address',
+                    hint: 'your.email@example.com',
+                    icon: Icons.email_outlined,
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email],
+                    textInputAction: TextInputAction.next,
+                    validator: AppValidators.email,
+                  ),
+                  SizedBox(height: AppSpacing.md),
+
+                  _buildTextField(
+                    label: 'Street Address',
+                    hint: 'Enter your street address',
+                    icon: Icons.home_outlined,
+                    controller: _streetController,
+                    autofillHints: const [AutofillHints.streetAddressLine1],
+                    textInputAction: TextInputAction.next,
+                    validator: (value) => AppValidators.requiredText(
+                      value,
+                      fieldName: 'Street address',
+                      minimumLength: 4,
+                    ),
+                  ),
+                  SizedBox(height: AppSpacing.md),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'City',
+                          hint: 'City',
+                          icon: Icons.location_city_outlined,
+                          controller: _cityController,
+                          autofillHints: const [AutofillHints.addressCity],
+                          textInputAction: TextInputAction.next,
+                          validator: (value) => AppValidators.requiredText(
+                            value,
+                            fieldName: 'City',
+                            minimumLength: 2,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'State/Region',
+                          hint: 'State or region',
+                          controller: _stateController,
+                          autofillHints: const [AutofillHints.addressState],
+                          textInputAction: TextInputAction.next,
+                          validator: (value) => AppValidators.requiredText(
+                            value,
+                            fieldName: 'State or region',
+                            minimumLength: 2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: AppSpacing.md),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'ZIP Code',
+                          hint: 'Enter ZIP code',
+                          controller: _postalCodeController,
+                          autofillHints: const [AutofillHints.postalCode],
+                          textInputAction: TextInputAction.next,
+                          validator: (value) => AppValidators.requiredText(
+                            value,
+                            fieldName: 'Postal code',
+                            minimumLength: 3,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'Phone',
+                          hint: '+1 (555) 000-0000',
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          autofillHints: const [AutofillHints.telephoneNumber],
+                          textInputAction: TextInputAction.next,
+                          validator: AppValidators.phone,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: AppSpacing.md),
+                  _buildTextField(
+                    label: 'Country',
+                    hint: 'Enter your country',
+                    icon: Icons.public_outlined,
+                    controller: _countryController,
+                    autofillHints: const [AutofillHints.countryName],
+                    textInputAction: TextInputAction.done,
+                    validator: (value) => AppValidators.requiredText(
+                      value,
+                      fieldName: 'Country',
+                      minimumLength: 2,
+                    ),
+                  ),
+
+                  SizedBox(height: AppSpacing.lg),
+                  _buildInfoBanner(
+                    'Review your address carefully to prevent delivery delays.',
+                    Icons.info_outline,
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -373,7 +453,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.border),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            color: AppColors.border.withOpacity(0.05),
+            color: AppColors.border.withValues(alpha: 0.05),
           ),
           child: Row(
             children: [
@@ -468,106 +548,113 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final formattedDate =
         '${months[deliveryDate.month - 1]} ${deliveryDate.day}, ${deliveryDate.year}';
 
-    return InkWell(
-      onTap: onSelect,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 2 : 1,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '$title, \$${price.toStringAsFixed(2)}',
+      child: InkWell(
+        onTap: onSelect,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? 2 : 1,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: 0.05)
+                : Colors.transparent,
           ),
-          borderRadius: BorderRadius.circular(12),
-          color: isSelected
-              ? AppColors.primary.withOpacity(0.05)
-              : Colors.transparent,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.border.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Icon(
-                  icon,
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
                   color: isSelected
-                      ? Colors.white
-                      : AppColors.foregroundSecondary,
+                      ? AppColors.primary
+                      : AppColors.border.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    color: isSelected
+                        ? Colors.white
+                        : AppColors.foregroundSecondary,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        title,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.foreground,
-                          fontWeight: AppTypography.semiBold,
-                        ),
-                      ),
-                      Text(
-                        '\$${price.toStringAsFixed(2)}',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.foreground,
-                          fontWeight: AppTypography.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: AppSpacing.xs),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          description,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.foregroundSecondary,
+              SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.foreground,
+                            fontWeight: AppTypography.semiBold,
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          formattedDate,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: AppTypography.medium,
+                        Text(
+                          '\$${price.toStringAsFixed(2)}',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.foreground,
+                            fontWeight: AppTypography.bold,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            description,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.foregroundSecondary,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.xs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            formattedDate,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: AppTypography.medium,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(width: AppSpacing.md),
-            Radio<String>(
-              value: _selectedShippingMethod,
-              groupValue: _selectedShippingMethod,
-              onChanged: (value) => onSelect(),
-              activeColor: AppColors.primary,
-            ),
-          ],
+              SizedBox(width: AppSpacing.md),
+              Icon(
+                isSelected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.foregroundSecondary,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -585,7 +672,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.border),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            color: AppColors.border.withOpacity(0.05),
+            color: AppColors.border.withValues(alpha: 0.05),
           ),
           child: Row(
             children: [
@@ -624,20 +711,25 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Payment method cards
-              ...paymentMethods.map(
-                (method) => Padding(
-                  padding: EdgeInsets.only(bottom: AppSpacing.md),
-                  child: _buildPaymentCardOption(method),
+              if (paymentMethods.isEmpty)
+                _buildInfoBanner(
+                  'No payment method is available. Add one before placing your order.',
+                  Icons.credit_card_off_outlined,
+                )
+              else
+                ...paymentMethods.map(
+                  (method) => Padding(
+                    padding: EdgeInsets.only(bottom: AppSpacing.md),
+                    child: _buildPaymentCardOption(method),
+                  ),
                 ),
-              ),
 
               SizedBox(height: AppSpacing.md),
 
               // Add payment method button
               OutlinedButton.icon(
                 onPressed: () {
-                  _showAddPaymentDialog();
+                  Navigator.of(context).pushNamed(AppRoutes.paymentMethods);
                 },
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('Add Payment Method'),
@@ -696,8 +788,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               Container(
                 padding: EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.05),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                  color: AppColors.primary.withValues(alpha: 0.05),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -737,76 +831,93 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   Widget _buildPaymentCardOption(dynamic method) {
     final maskedCard = _maskCardNumber(method.cardNumber ?? '');
+    final isSelected =
+        _selectedPaymentMethodId == method.id ||
+        (_selectedPaymentMethodId == null && method.isDefault);
 
-    return Container(
-      padding: EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.border),
+    return Semantics(
+      selected: isSelected,
+      button: true,
+      label: '${method.name}, $maskedCard',
+      child: InkWell(
+        onTap: () => setState(() => _selectedPaymentMethodId = method.id),
         borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.border.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+              width: isSelected ? 2 : 1,
             ),
-            child: Center(
-              child: Icon(
-                _getPaymentIcon(method.type),
-                color: AppColors.primary,
-              ),
-            ),
+            borderRadius: BorderRadius.circular(12),
           ),
-          SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  method.name ?? method.type,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.foreground,
-                    fontWeight: AppTypography.semiBold,
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.border.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Icon(
+                    _getPaymentIcon(method.type),
+                    color: AppColors.primary,
                   ),
                 ),
-                SizedBox(height: AppSpacing.xs),
-                Text(
-                  maskedCard,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.foregroundSecondary,
+              ),
+              SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      method.name ?? method.type,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.foreground,
+                        fontWeight: AppTypography.semiBold,
+                      ),
+                    ),
+                    SizedBox(height: AppSpacing.xs),
+                    Text(
+                      maskedCard,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.foregroundSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (method.isDefault)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Default',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: AppTypography.semiBold,
+                    ),
                   ),
                 ),
-              ],
-            ),
+              Icon(
+                isSelected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_unchecked,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.foregroundSecondary,
+              ),
+            ],
           ),
-          if (method.isDefault)
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.xs,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                'Default',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: AppTypography.semiBold,
-                ),
-              ),
-            ),
-          Radio<bool>(
-            value: true,
-            groupValue: true,
-            onChanged: (value) {},
-            activeColor: AppColors.primary,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -815,7 +926,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final subtotal = cartState.subtotal ?? 0.0;
     final shippingCost = 5.99;
     final tax = subtotal * 0.1;
-    final total = subtotal + shippingCost + tax - _discountAmount;
+    final total = subtotal + shippingCost + tax;
 
     return Container(
       padding: EdgeInsets.all(AppSpacing.lg),
@@ -854,132 +965,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           SizedBox(height: AppSpacing.sm),
           _buildSummaryRow('Tax', '\$${tax.toStringAsFixed(2)}'),
 
-          if (_appliedPromo != null) ...[
-            SizedBox(height: AppSpacing.sm),
-            _buildSummaryRow(
-              'Discount',
-              '-\$${_discountAmount.toStringAsFixed(2)}',
-              isBold: true,
-              isDiscount: true,
-            ),
-          ],
-
-          SizedBox(height: AppSpacing.md),
-
-          // Promo code section
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.border),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: _expandPromoSection
-                ? Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Promo Code',
-                                  style: AppTypography.bodyMedium.copyWith(
-                                    color: AppColors.foreground,
-                                    fontWeight: AppTypography.semiBold,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() => _expandPromoSection = false);
-                                  },
-                                  child: Icon(
-                                    Icons.expand_less,
-                                    color: AppColors.foregroundSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: AppSpacing.sm),
-                            TextField(
-                              controller: _promoController,
-                              decoration: InputDecoration(
-                                hintText: 'Enter promo code',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.md,
-                                  vertical: AppSpacing.sm,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: AppSpacing.sm),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _applyPromoCode();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Apply Code',
-                                  style: AppTypography.bodyMedium.copyWith(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                : GestureDetector(
-                    onTap: () {
-                      setState(() => _expandPromoSection = true);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(AppSpacing.md),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.local_offer_outlined,
-                                color: AppColors.primary,
-                              ),
-                              SizedBox(width: AppSpacing.sm),
-                              Text(
-                                _appliedPromo ?? 'Add Promo Code',
-                                style: AppTypography.bodyMedium.copyWith(
-                                  color: _appliedPromo != null
-                                      ? AppColors.primary
-                                      : AppColors.foregroundSecondary,
-                                  fontWeight: _appliedPromo != null
-                                      ? AppTypography.semiBold
-                                      : null,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.expand_more,
-                            color: AppColors.foregroundSecondary,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-          ),
-
           SizedBox(height: AppSpacing.md),
 
           // Total with border
@@ -988,7 +973,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.primary, width: 2),
               borderRadius: BorderRadius.circular(8),
-              color: AppColors.primary.withOpacity(0.05),
+              color: AppColors.primary.withValues(alpha: 0.05),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1098,8 +1083,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget _buildTextField({
     required String label,
     required String hint,
+    required TextEditingController controller,
     IconData? icon,
     TextInputType keyboardType = TextInputType.text,
+    Iterable<String>? autofillHints,
+    TextInputAction? textInputAction,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1112,8 +1101,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           ),
         ),
         SizedBox(height: AppSpacing.xs),
-        TextField(
+        TextFormField(
+          controller: controller,
           keyboardType: keyboardType,
+          autofillHints: autofillHints,
+          textInputAction: textInputAction,
+          validator: validator,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: icon != null
@@ -1142,8 +1136,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.05),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+        color: AppColors.primary.withValues(alpha: 0.05),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -1165,7 +1159,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.border.withOpacity(0.1),
+        color: AppColors.border.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -1218,128 +1212,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
   }
 
-  void _applyPromoCode() {
-    final code = _promoController.text.trim();
-    if (code.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a promo code')),
-      );
-      return;
-    }
-
-    // Simulate promo code validation
-    if (code.toUpperCase() == 'SAVE10') {
-      setState(() {
-        _appliedPromo = code.toUpperCase();
-        _discountAmount = 10.0;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Promo code applied successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid promo code'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  void _showAddPaymentDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Payment Method'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.credit_card),
-              title: const Text('Credit/Debit Card'),
-              onTap: () {
-                Navigator.pop(context);
-                _showCardForm();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.payment),
-              title: const Text('PayPal'),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Redirecting to PayPal...')),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.apple),
-              title: const Text('Apple Pay'),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Redirecting to Apple Pay...')),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showCardForm() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Card'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const TextField(
-              decoration: InputDecoration(labelText: 'Card Number'),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: const TextField(
-                    decoration: InputDecoration(labelText: 'MM/YY'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: const TextField(
-                    decoration: InputDecoration(labelText: 'CVC'),
-                    obscureText: true,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Card added successfully!')),
-              );
-            },
-            child: const Text('Add Card'),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActionButtons() {
     return Container(
       decoration: BoxDecoration(
@@ -1366,11 +1238,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   text: _currentStep == 2
                       ? (_isProcessing ? 'Processing...' : 'Place Order')
                       : 'Next',
-                  onPressed: _currentStep == 2 && _acceptTerms && !_isProcessing
-                      ? () {
-                          _processOrder();
-                        }
-                      : null,
+                  onPressed: _isProcessing ? null : _handlePrimaryAction,
                   fullWidth: true,
                 ),
               ),
@@ -1381,25 +1249,84 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
+  Future<void> _handlePrimaryAction() async {
+    if (_currentStep == 0) {
+      final isValid = _shippingFormKey.currentState?.validate() ?? false;
+      if (!isValid) {
+        setState(() => _expandAddressSection = true);
+        return;
+      }
+      setState(() => _currentStep = 1);
+      return;
+    }
+
+    if (_currentStep == 1) {
+      final methods = ref.read(paymentMethodsProvider);
+      if (_selectedPaymentMethodId == null && methods.isNotEmpty) {
+        final defaultMethods = methods.where((method) => method.isDefault);
+        _selectedPaymentMethodId = defaultMethods.isNotEmpty
+            ? defaultMethods.first.id
+            : methods.first.id;
+      }
+      setState(() => _currentStep = 2);
+      return;
+    }
+
+    if (ref.read(cartProvider).items.isEmpty) {
+      _showError('Your cart is empty. Add an item before checking out.');
+      return;
+    }
+    if (_selectedPaymentMethod() == null) {
+      _showError('Select a payment method before placing your order.');
+      return;
+    }
+    if (!_acceptTerms) {
+      _showError('Accept the terms and return policy to continue.');
+      return;
+    }
+
+    await _processOrder();
+  }
+
+  PaymentMethod? _selectedPaymentMethod() {
+    final methods = ref.read(paymentMethodsProvider);
+    if (methods.isEmpty) return null;
+    if (_selectedPaymentMethodId != null) {
+      for (final method in methods) {
+        if (method.id == _selectedPaymentMethodId) return method;
+      }
+    }
+    for (final method in methods) {
+      if (method.isDefault) return method;
+    }
+    return methods.first;
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   Future<void> _processOrder() async {
     setState(() => _isProcessing = true);
 
-    // Create the order
     final cartState = ref.read(cartProvider);
-    final defaultAddress = ref.read(defaultAddressProvider);
-
-    // Use default address or create a placeholder
-    final shippingAddress =
-        defaultAddress ??
-        const ShippingAddress(
-          id: 'temp',
-          name: 'Default',
-          street: '123 Main Street',
-          city: 'New York',
-          state: 'NY',
-          zipCode: '10001',
-          country: 'USA',
-        );
+    final paymentMethod = _selectedPaymentMethod()!;
+    final shippingAddress = ShippingAddress(
+      id: 'checkout',
+      name: _nameController.text.trim(),
+      street: _streetController.text.trim(),
+      city: _cityController.text.trim(),
+      state: _stateController.text.trim(),
+      zipCode: _postalCodeController.text.trim(),
+      country: _countryController.text.trim(),
+      phone: _phoneController.text.trim(),
+    );
 
     final subtotal = cartState.subtotal;
     final shippingCost = _selectedShippingMethod == 'express'
@@ -1409,39 +1336,45 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         : 5.99;
     final tax = subtotal * 0.1;
 
-    // Create the order
-    final order = await ref
-        .read(orderProvider.notifier)
-        .createOrder(
-          items: cartState.items,
-          shippingAddress: shippingAddress,
-          paymentMethod: 'Visa •••• 4532',
-          subtotal: subtotal,
-          shippingCost: shippingCost,
-          tax: tax,
-          discount: _discountAmount,
-          promoCode: _appliedPromo,
-        );
+    try {
+      final order = await ref
+          .read(orderProvider.notifier)
+          .createOrder(
+            items: cartState.items,
+            shippingAddress: shippingAddress,
+            paymentMethod:
+                '${paymentMethod.name} •••• ${paymentMethod.cardNumber ?? ''}',
+            subtotal: subtotal,
+            shippingCost: shippingCost,
+            tax: tax,
+          );
 
-    // Clear the cart
-    ref.read(cartProvider.notifier).clearCart();
-
-    setState(() => _isProcessing = false);
-
-    // Navigate to order confirmation
-    if (mounted) {
+      await ref.read(cartProvider.notifier).clearCart();
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => OrderConfirmationScreen(order: order),
         ),
       );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
+      _showError('We could not place your order. Please try again.');
     }
   }
 
   @override
   void dispose() {
-    _promoController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _streetController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _postalCodeController.dispose();
+    _countryController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 }

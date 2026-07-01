@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../../providers/notifiers/product_notifier.dart';
 import '../../widgets/cards/cards.dart';
 
@@ -22,10 +23,7 @@ class WishlistScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Wishlist',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -64,15 +62,6 @@ class WishlistScreen extends ConsumerWidget {
                         style: AppTypography.bodyLarge.copyWith(
                           color: AppColors.foreground,
                           fontWeight: AppTypography.semiBold,
-                        ),
-                      ),
-                      const Spacer(),
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.sort, size: 18),
-                        label: const Text('Sort'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.foregroundSecondary,
                         ),
                       ),
                     ],

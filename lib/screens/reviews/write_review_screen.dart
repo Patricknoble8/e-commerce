@@ -64,26 +64,29 @@ class _WriteReviewScreenState extends ConsumerState<WriteReviewScreen> {
         imageQuality: 80,
       );
 
+      if (!mounted) return;
       if (pickedFiles.isNotEmpty) {
+        final reachedLimit = _images.length + pickedFiles.length > 5;
         setState(() {
-          // In production, upload to server and get URLs
-          // For demo, just use file paths
           _images.addAll(pickedFiles.map((f) => f.path));
           if (_images.length > 5) {
             _images = _images.sublist(0, 5);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Maximum 5 images allowed'),
-                backgroundColor: AppColors.warning,
-              ),
-            );
           }
         });
+        if (reachedLimit) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Maximum 5 images allowed'),
+              backgroundColor: AppColors.warning,
+            ),
+          );
+        }
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to pick images'),
+          content: const Text('Failed to pick images'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -230,7 +233,7 @@ class _WriteReviewScreenState extends ConsumerState<WriteReviewScreen> {
               width: 60,
               height: 60,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+              errorBuilder: (_, _, _) => Container(
                 width: 60,
                 height: 60,
                 color: AppColors.backgroundMuted,
@@ -438,7 +441,7 @@ class _WriteReviewScreenState extends ConsumerState<WriteReviewScreen> {
                           child: Image.network(
                             entry.value,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
+                            errorBuilder: (_, _, _) => Container(
                               color: AppColors.backgroundMuted,
                               child: Icon(
                                 Icons.image,

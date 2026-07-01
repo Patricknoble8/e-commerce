@@ -75,8 +75,6 @@ class ProductNotifier extends StateNotifier<ProductListState> {
         }
       }
     } else {
-      // Demo mode - use local data
-      await Future.delayed(const Duration(milliseconds: 300));
       if (mounted) {
         state = ProductListState(
           products: ProductData.products,

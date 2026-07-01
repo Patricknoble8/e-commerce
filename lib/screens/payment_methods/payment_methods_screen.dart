@@ -3,73 +3,63 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
+import '../../models/payment_method.dart';
 import '../../providers/notifiers/profile_notifier.dart';
+import '../../widgets/common/app_back_button.dart';
 
 class PaymentMethodsScreen extends ConsumerWidget {
   const PaymentMethodsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final paymentMethods = ref.watch(paymentMethodsProvider);
+    final paymentState = ref.watch(paymentMethodsNotifierProvider);
+    final paymentMethods = paymentState.methods;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Payment Methods',
-          style: AppTypography.h4.copyWith(
-            color: AppColors.foreground,
-          ),
+          style: AppTypography.h4.copyWith(color: AppColors.foreground),
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
+      body: paymentState.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : paymentMethods.isEmpty
+          ? const _EmptyPaymentMethods()
+          : ListView.builder(
               padding: EdgeInsets.all(AppSpacing.md),
               itemCount: paymentMethods.length,
               itemBuilder: (context, index) {
                 final method = paymentMethods[index];
-                return _PaymentMethodCard(method: method);
+                return _PaymentMethodCard(
+                  method: method,
+                  onSetDefault: () => ref
+                      .read(paymentMethodsNotifierProvider.notifier)
+                      .setDefaultPaymentMethod(method.id),
+                  onDelete: () => ref
+                      .read(paymentMethodsNotifierProvider.notifier)
+                      .removePaymentMethod(method.id),
+                );
               },
             ),
-          ),
-          
-          // Add Payment Method Button
-          Padding(
-            padding: EdgeInsets.all(AppSpacing.md),
-            child: OutlinedButton.icon(
-              onPressed: () {
-                // Add new payment method
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Add Payment Method'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
 
 class _PaymentMethodCard extends StatelessWidget {
-  final method;
+  final PaymentMethod method;
+  final VoidCallback onSetDefault;
+  final VoidCallback onDelete;
 
-  const _PaymentMethodCard({required this.method});
+  const _PaymentMethodCard({
+    required this.method,
+    required this.onSetDefault,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +116,7 @@ class _PaymentMethodCard extends StatelessWidget {
                               vertical: AppSpacing.xs / 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(AppRadius.sm),
                             ),
                             child: Text(
@@ -164,24 +154,22 @@ class _PaymentMethodCard extends StatelessWidget {
 
               // More Options
               PopupMenuButton(
+                tooltip: 'Payment method actions',
                 icon: Icon(
                   Icons.more_vert,
                   color: AppColors.foregroundSecondary,
                 ),
+                onSelected: (action) {
+                  if (action == 'default') onSetDefault();
+                  if (action == 'delete') onDelete();
+                },
                 itemBuilder: (context) => [
                   if (!method.isDefault)
                     const PopupMenuItem(
                       value: 'default',
                       child: Text('Set as Default'),
                     ),
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Text('Edit'),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Text('Delete'),
-                  ),
+                  const PopupMenuItem(value: 'delete', child: Text('Delete')),
                 ],
               ),
             ],
@@ -204,5 +192,38 @@ class _PaymentMethodCard extends StatelessWidget {
       default:
         return Icons.payment;
     }
+  }
+}
+
+class _EmptyPaymentMethods extends StatelessWidget {
+  const _EmptyPaymentMethods();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.credit_card_off_outlined,
+              size: 48,
+              color: AppColors.foregroundSecondary,
+            ),
+            SizedBox(height: AppSpacing.md),
+            Text('No saved payment methods', style: AppTypography.h4),
+            SizedBox(height: AppSpacing.sm),
+            Text(
+              'Payment methods will appear here after they are securely added through your payment provider.',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.foregroundSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

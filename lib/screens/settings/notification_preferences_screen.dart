@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
+import '../../widgets/common/app_back_button.dart';
 
 /// Model for notification preferences
 class NotificationPreferences {
@@ -132,10 +133,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Notifications',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -358,7 +356,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
               padding: EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: value
-                    ? AppColors.primary.withOpacity(0.1)
+                    ? AppColors.primary.withValues(alpha: 0.1)
                     : AppColors.muted,
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
@@ -393,7 +391,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
             Switch.adaptive(
               value: value,
               onChanged: onChanged,
-              activeColor: AppColors.primary,
+              activeThumbColor: AppColors.primary,
             ),
           ],
         ),
@@ -421,7 +419,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
                 padding: EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
                   color: value
-                      ? AppColors.primary.withOpacity(0.1)
+                      ? AppColors.primary.withValues(alpha: 0.1)
                       : AppColors.muted,
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
@@ -480,7 +478,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
               Container(
                 padding: EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(
@@ -541,7 +539,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
                 title: const Text('Enable Quiet Hours'),
                 value: enabled,
                 onChanged: (v) => setState(() => enabled = v),
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
               ),
               if (enabled) ...[
                 const Divider(),

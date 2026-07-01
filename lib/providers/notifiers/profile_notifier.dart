@@ -84,37 +84,27 @@ class PaymentMethodsNotifier extends StateNotifier<PaymentMethodsState> {
   }
 
   void _loadPaymentMethods() {
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        state = PaymentMethodsState(
-          methods: const [
-            PaymentMethod(
-              id: '1',
-              type: 'card',
-              name: 'Visa',
-              cardNumber: '4532',
-              expiryDate: '12/25',
-              isDefault: true,
-            ),
-            PaymentMethod(
-              id: '2',
-              type: 'card',
-              name: 'Mastercard',
-              cardNumber: '5425',
-              expiryDate: '08/26',
-              isDefault: false,
-            ),
-            PaymentMethod(
-              id: '3',
-              type: 'paypal',
-              name: 'PayPal',
-              isDefault: false,
-            ),
-          ],
-          isLoading: false,
-        );
-      }
-    });
+    state = PaymentMethodsState(
+      methods: const [
+        PaymentMethod(
+          id: '1',
+          type: 'card',
+          name: 'Visa',
+          cardNumber: '4532',
+          expiryDate: '12/25',
+          isDefault: true,
+        ),
+        PaymentMethod(
+          id: '2',
+          type: 'card',
+          name: 'Mastercard',
+          cardNumber: '5425',
+          expiryDate: '08/26',
+          isDefault: false,
+        ),
+      ],
+      isLoading: false,
+    );
   }
 
   /// Add new payment method

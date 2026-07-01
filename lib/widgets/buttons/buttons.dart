@@ -45,7 +45,7 @@ class PrimaryButton extends StatelessWidget {
               ),
             ).copyWith(
               overlayColor: WidgetStateProperty.all(
-                AppColors.primaryHover.withOpacity(0.1),
+                AppColors.primaryHover.withValues(alpha: 0.1),
               ),
             ),
         child: isLoading
@@ -118,7 +118,7 @@ class SecondaryButton extends StatelessWidget {
               ),
             ).copyWith(
               overlayColor: WidgetStateProperty.all(
-                AppColors.secondary.withOpacity(0.5),
+                AppColors.secondary.withValues(alpha: 0.5),
               ),
             ),
         child: Row(
@@ -163,7 +163,7 @@ class GhostButton extends StatelessWidget {
             ),
           ).copyWith(
             overlayColor: WidgetStateProperty.all(
-              AppColors.muted.withOpacity(0.5),
+              AppColors.muted.withValues(alpha: 0.5),
             ),
           ),
       child: Row(

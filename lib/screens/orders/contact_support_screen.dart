@@ -5,6 +5,7 @@ import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
 import '../../models/order.dart';
 import '../../widgets/buttons/buttons.dart';
+import '../../widgets/common/app_back_button.dart';
 
 /// Contact support screen for order-related issues
 class ContactSupportScreen extends StatefulWidget {
@@ -21,7 +22,6 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
   final _subjectController = TextEditingController();
   final _messageController = TextEditingController();
   String _selectedCategory = 'Order Issue';
-  bool _isSubmitting = false;
 
   final List<String> _categories = [
     'Order Issue',
@@ -50,96 +50,12 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
 
   Future<void> _submitRequest() async {
     if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isSubmitting = true);
-
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() => _isSubmitting = false);
-
-    if (mounted) {
-      _showSuccessDialog();
-    }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check_circle,
-                color: AppColors.success,
-                size: 48,
-              ),
-            ),
-            SizedBox(height: AppSpacing.lg),
-            Text(
-              'Request Submitted',
-              style: AppTypography.h4.copyWith(color: AppColors.foreground),
-            ),
-            SizedBox(height: AppSpacing.sm),
-            Text(
-              'Our support team will get back to you within 24 hours.',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.foregroundSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: AppSpacing.lg),
-            Container(
-              padding: EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: AppColors.muted,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.confirmation_number_outlined,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
-                  SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'Ticket #${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.foreground,
-                      fontWeight: AppTypography.semiBold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Online support is temporarily unavailable. Please use the contact details below.',
         ),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: PrimaryButton(
-              text: 'Done',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              fullWidth: true,
-            ),
-          ),
-        ],
-        actionsPadding: EdgeInsets.all(AppSpacing.lg),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -151,10 +67,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Contact Support',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -255,31 +168,10 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 SizedBox(height: AppSpacing.lg),
               ],
 
-              // Attachment option
-              OutlinedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('File attachment coming soon'),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.attach_file),
-                label: const Text('Attach Files'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                  side: const BorderSide(color: AppColors.border),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              SizedBox(height: AppSpacing.xl),
-
               // Submit button
               PrimaryButton(
-                text: _isSubmitting ? 'Submitting...' : 'Submit Request',
-                onPressed: _isSubmitting ? null : _submitRequest,
+                text: 'Submit Request',
+                onPressed: _submitRequest,
                 fullWidth: true,
               ),
               SizedBox(height: AppSpacing.lg),

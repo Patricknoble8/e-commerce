@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/navigation/app_routes.dart';
 import '../../config/theme/colors.dart';
 import '../../providers/notifiers/auth_notifier.dart';
-import 'register_screen.dart';
+import '../../utils/validators.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  final String? redirectRoute;
+
+  const LoginScreen({super.key, this.redirectRoute});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -32,8 +35,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() {
       if (value.isEmpty) {
         _emailError = null;
-      } else if (!value.contains('@') || !value.contains('.')) {
-        _emailError = 'Please enter a valid email address';
+      } else if (AppValidators.email(value) != null) {
+        _emailError = 'Enter a valid email address';
       } else {
         _emailError = null;
       }
@@ -44,8 +47,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() {
       if (value.isEmpty) {
         _passwordError = null;
-      } else if (value.length < 6) {
-        _passwordError = 'Password must be at least 6 characters';
+      } else if (value.length < 8) {
+        _passwordError = 'Password must be at least 8 characters';
       } else {
         _passwordError = null;
       }
@@ -91,23 +94,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (success && mounted) {
       _failedAttempts = 0;
       // Navigate to home and clear the navigation stack
-      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        widget.redirectRoute ?? AppRoutes.home,
+        (route) => false,
+      );
     } else {
       setState(() {
         _failedAttempts++;
       });
     }
-  }
-
-  Future<void> _handleSocialLogin(String provider) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$provider login will be available soon'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
   }
 
   void _showForgotPasswordDialog() {
@@ -326,6 +321,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.email],
+                          autocorrect: false,
                           onChanged: _validateEmail,
                           style: const TextStyle(fontSize: 15),
                           decoration: InputDecoration(
@@ -393,15 +391,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Email is required';
-                            }
-                            if (!value.contains('@') || !value.contains('.')) {
-                              return 'Please enter a valid email address';
-                            }
-                            return null;
-                          },
+                          validator: AppValidators.email,
                         ),
                         if (_emailError != null) ...[
                           const SizedBox(height: 8),
@@ -433,6 +423,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
+                          textInputAction: TextInputAction.done,
+                          autofillHints: const [AutofillHints.password],
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          onFieldSubmitted: (_) {
+                            if (!authState.isLoading) _handleLogin();
+                          },
                           onChanged: _validatePassword,
                           style: const TextStyle(fontSize: 15),
                           decoration: InputDecoration(
@@ -447,6 +444,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: Icon(Icons.lock_outlined, size: 20),
                             ),
                             suffixIcon: IconButton(
+                              tooltip: _obscurePassword
+                                  ? 'Show password'
+                                  : 'Hide password',
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_outlined
@@ -487,15 +487,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password is required';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
-                          },
+                          validator: AppValidators.password,
                         ),
                         if (_passwordError != null) ...[
                           const SizedBox(height: 8),
@@ -617,60 +609,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                       ),
                     ),
-                    const SizedBox(height: 28),
-
-                    // Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(color: AppColors.border, thickness: 1),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'or continue with',
-                            style: TextStyle(
-                              color: AppColors.foregroundMuted,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(color: AppColors.border, thickness: 1),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 28),
-
-                    // Social Login Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _SocialLoginButton(
-                            icon: Icons.g_mobiledata_rounded,
-                            label: 'Google',
-                            onPressed: () => _handleSocialLogin('Google'),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _SocialLoginButton(
-                            icon: Icons.apple,
-                            label: 'Apple',
-                            onPressed: () => _handleSocialLogin('Apple'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: _SocialLoginButton(
-                        icon: Icons.facebook_rounded,
-                        label: 'Facebook',
-                        onPressed: () => _handleSocialLogin('Facebook'),
-                      ),
-                    ),
                     const SizedBox(height: 32),
 
                     // Security Badge
@@ -711,10 +649,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
+                            Navigator.of(context).pushReplacementNamed(
+                              AppRoutes.register,
+                              arguments: widget.redirectRoute,
                             );
                           },
                           style: TextButton.styleFrom(
@@ -742,47 +679,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Social Login Button Widget
-class _SocialLoginButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-
-  const _SocialLoginButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: const BorderSide(color: AppColors.border, width: 1.5),
-        backgroundColor: Colors.transparent,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 20, color: AppColors.foreground),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.foreground,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }

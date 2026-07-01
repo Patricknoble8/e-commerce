@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../../models/notification.dart';
 import '../../providers/notifiers/notifications_notifier.dart';
 
@@ -101,10 +102,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -282,8 +280,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
       label: Text('$label ($count)'),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: AppColors.border.withOpacity(0.3),
-      selectedColor: AppColors.primary.withOpacity(0.2),
+      backgroundColor: AppColors.border.withValues(alpha: 0.3),
+      selectedColor: AppColors.primary.withValues(alpha: 0.2),
       labelStyle: AppTypography.bodySmall.copyWith(
         color: isSelected ? AppColors.primary : AppColors.foregroundSecondary,
         fontWeight: isSelected ? AppTypography.semiBold : AppTypography.regular,
@@ -303,7 +301,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
         alignment: Alignment.centerRight,
         padding: EdgeInsets.only(right: AppSpacing.lg),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
+          color: Colors.red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(Icons.delete_outline, color: Colors.red),
@@ -333,13 +331,13 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           decoration: BoxDecoration(
             border: Border.all(
               color: !notification.isRead
-                  ? AppColors.primary.withOpacity(0.5)
+                  ? AppColors.primary.withValues(alpha: 0.5)
                   : AppColors.border,
               width: !notification.isRead ? 1.5 : 1,
             ),
             borderRadius: BorderRadius.circular(12),
             color: !notification.isRead
-                ? AppColors.primary.withOpacity(0.05)
+                ? AppColors.primary.withValues(alpha: 0.05)
                 : Colors.white,
           ),
           child: Column(
@@ -355,7 +353,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                     decoration: BoxDecoration(
                       color: _getNotificationColor(
                         notification.type,
-                      ).withOpacity(0.1),
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -434,7 +432,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                     vertical: AppSpacing.sm,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -576,22 +574,22 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
     switch (status) {
       case 'completed':
-        backgroundColor = Colors.green.withOpacity(0.1);
+        backgroundColor = Colors.green.withValues(alpha: 0.1);
         textColor = Colors.green;
         label = 'Completed';
         break;
       case 'pending':
-        backgroundColor = Colors.orange.withOpacity(0.1);
+        backgroundColor = Colors.orange.withValues(alpha: 0.1);
         textColor = Colors.orange;
         label = 'Pending';
         break;
       case 'failed':
-        backgroundColor = Colors.red.withOpacity(0.1);
+        backgroundColor = Colors.red.withValues(alpha: 0.1);
         textColor = Colors.red;
         label = 'Failed';
         break;
       default:
-        backgroundColor = AppColors.border.withOpacity(0.3);
+        backgroundColor = AppColors.border.withValues(alpha: 0.3);
         textColor = AppColors.foregroundSecondary;
         label = status;
     }
@@ -625,7 +623,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.border.withOpacity(0.2),
+              color: AppColors.border.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -675,7 +673,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
             Container(
               padding: EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.border.withOpacity(0.1),
+                color: AppColors.border.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(

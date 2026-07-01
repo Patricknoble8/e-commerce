@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +7,7 @@ import '../../providers/notifiers/product_notifier.dart';
 import '../../models/product.dart';
 import '../../widgets/common/cached_image.dart';
 import '../../widgets/common/shimmer_loading.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../product_detail/product_detail_screen.dart';
 
 /// Professional search results screen with real-time filtering
@@ -21,6 +24,7 @@ class SearchResultsScreen extends ConsumerStatefulWidget {
 class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
   late TextEditingController _searchController;
   final FocusNode _focusNode = FocusNode();
+  Timer? _searchDebounce;
   bool _isLoading = false;
 
   // Colors
@@ -53,6 +57,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -60,11 +65,10 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
 
   void _onSearchChanged(String value) {
     setState(() => _isLoading = true);
-    ref.read(searchQueryProvider.notifier).state = value;
-
-    // Simulate search delay for better UX
-    Future.delayed(const Duration(milliseconds: 300), () {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
       if (mounted) {
+        ref.read(searchQueryProvider.notifier).state = value.trim();
         setState(() => _isLoading = false);
       }
     });
@@ -72,8 +76,10 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
 
   void _clearSearch() {
     HapticFeedback.lightImpact();
+    _searchDebounce?.cancel();
     _searchController.clear();
     ref.read(searchQueryProvider.notifier).state = '';
+    setState(() => _isLoading = false);
     _focusNode.requestFocus();
   }
 
@@ -110,12 +116,13 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
       backgroundColor: _background,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: _foreground),
+      leading: AppBackButton(
+        foregroundColor: _foreground,
+        backgroundColor: _background,
         onPressed: () {
           // Clear search when leaving
           ref.read(searchQueryProvider.notifier).state = '';
-          Navigator.pop(context);
+          Navigator.of(context).maybePop();
         },
       ),
       title: Container(
@@ -182,8 +189,8 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: 5,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (_, __) => const ListItemShimmer(),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
+      itemBuilder: (_, _) => const ListItemShimmer(),
     );
   }
 
@@ -244,7 +251,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: products.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final product = products[index];
         final isFavorite = favorites.contains(product.id);
@@ -276,7 +283,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
             border: Border.all(color: _border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -351,7 +358,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: _destructive.withOpacity(0.1),
+                              color: _destructive.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -381,7 +388,9 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isFavorite ? _destructive.withOpacity(0.1) : _muted,
+                    color: isFavorite
+                        ? _destructive.withValues(alpha: 0.1)
+                        : _muted,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

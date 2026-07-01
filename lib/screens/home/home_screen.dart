@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/navigation/app_routes.dart';
 import '../../providers/providers.dart';
+import '../../models/category.dart';
 import '../../models/product.dart';
 import '../../data/category_data.dart';
 import '../product_detail/product_detail_screen.dart';
@@ -90,7 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             HapticFeedback.mediumImpact();
             ref.invalidate(filteredProductsProvider);
             await Future.delayed(const Duration(milliseconds: 800));
-            if (mounted) {
+            if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Row(
@@ -221,7 +223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           width: width,
           height: height,
           decoration: BoxDecoration(
-            color: _muted.withOpacity(value),
+            color: _muted.withValues(alpha: value),
             borderRadius: BorderRadius.circular(radius),
           ),
         );
@@ -398,7 +400,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           border: Border.all(color: _border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -523,7 +525,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               return GestureDetector(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  // TODO: Navigate to promotion
+                  Navigator.of(context).pushNamed(AppRoutes.categories);
                 },
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -531,7 +533,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -552,8 +554,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                               colors: [
-                                Colors.black.withOpacity(0.75),
-                                Colors.black.withOpacity(0.1),
+                                Colors.black.withValues(alpha: 0.75),
+                                Colors.black.withValues(alpha: 0.1),
                               ],
                             ),
                           ),
@@ -571,7 +573,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -601,7 +603,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withValues(alpha: 0.8),
                                 ),
                               ),
                               const SizedBox(height: 10),
@@ -737,7 +739,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: displayCategories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final category = displayCategories[index];
                 return _buildCategoryCard(category);
@@ -749,7 +751,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildCategoryCard(category) {
+  Widget _buildCategoryCard(Category category) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -773,7 +775,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 border: Border.all(color: _border, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -861,7 +863,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 1),
                           ),
@@ -945,7 +947,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             border: Border.all(color: _border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -992,12 +994,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: isFavorite
-                                  ? _destructive.withOpacity(0.1)
+                                  ? _destructive.withValues(alpha: 0.1)
                                   : _card,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.08),
+                                  color: Colors.black.withValues(alpha: 0.08),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -1197,7 +1199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         border: Border(top: BorderSide(color: _border)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),

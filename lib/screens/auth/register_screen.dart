@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/navigation/app_routes.dart';
 import '../../config/theme/colors.dart';
 import '../../providers/notifiers/auth_notifier.dart';
+import '../../utils/validators.dart';
 import '../../widgets/password_strength_indicator.dart';
-import 'login_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+  final String? redirectRoute;
+
+  const RegisterScreen({super.key, this.redirectRoute});
 
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
@@ -52,8 +55,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     setState(() {
       if (value.isEmpty) {
         _emailError = null;
-      } else if (!value.contains('@') || !value.contains('.')) {
-        _emailError = 'Please enter a valid email address';
+      } else if (AppValidators.email(value) != null) {
+        _emailError = 'Enter a valid email address';
       } else {
         _emailError = null;
       }
@@ -179,19 +182,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
 
       // Navigate to home and clear the navigation stack
-      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        widget.redirectRoute ?? AppRoutes.home,
+        (route) => false,
+      );
     }
-  }
-
-  Future<void> _handleSocialSignup(String provider) async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$provider signup will be available soon'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
   }
 
   @override
@@ -321,15 +316,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       error: _nameError,
                       onChanged: _validateName,
                       textCapitalization: TextCapitalization.words,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Name is required';
-                        }
-                        if (value.length < 2) {
-                          return 'Name must be at least 2 characters';
-                        }
-                        return null;
-                      },
+                      autofillHints: const [AutofillHints.name],
+                      textInputAction: TextInputAction.next,
+                      validator: (value) => AppValidators.requiredText(
+                        value,
+                        fieldName: 'Name',
+                        minimumLength: 2,
+                      ),
                     ),
                     const SizedBox(height: 20),
 
@@ -342,18 +335,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       error: _emailError,
                       onChanged: _validateEmail,
                       keyboardType: TextInputType.emailAddress,
+                      autofillHints: const [AutofillHints.email],
+                      textInputAction: TextInputAction.next,
                       showCheckIcon:
                           _emailError == null &&
                           _emailController.text.isNotEmpty,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!value.contains('@') || !value.contains('.')) {
-                          return 'Please enter a valid email address';
-                        }
-                        return null;
-                      },
+                      validator: AppValidators.email,
                     ),
                     const SizedBox(height: 20),
 
@@ -373,6 +360,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
+                          textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.newPassword],
+                          enableSuggestions: false,
+                          autocorrect: false,
                           onChanged: _validatePassword,
                           style: const TextStyle(fontSize: 15),
                           decoration: InputDecoration(
@@ -387,6 +378,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               child: Icon(Icons.lock_outlined, size: 20),
                             ),
                             suffixIcon: IconButton(
+                              tooltip: _obscurePassword
+                                  ? 'Show password'
+                                  : 'Hide password',
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_outlined
@@ -427,12 +421,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password is required';
-                            }
-                            return null;
-                          },
+                          validator: AppValidators.strongPassword,
                         ),
                         if (_showPasswordRequirements)
                           PasswordStrengthIndicator(
@@ -451,6 +440,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       error: _confirmPasswordError,
                       onChanged: _validateConfirmPassword,
                       obscureText: _obscureConfirmPassword,
+                      autofillHints: const [AutofillHints.newPassword],
+                      textInputAction: TextInputAction.done,
                       isPassword: true,
                       onToggleVisibility: () {
                         setState(() {
@@ -591,51 +582,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                       ),
                     ),
-                    const SizedBox(height: 28),
-
-                    // Divider
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(color: AppColors.border, thickness: 1),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'or sign up with',
-                            style: TextStyle(
-                              color: AppColors.foregroundMuted,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(color: AppColors.border, thickness: 1),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 28),
-
-                    // Social Signup Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _SocialSignupButton(
-                            icon: Icons.g_mobiledata_rounded,
-                            label: 'Google',
-                            onPressed: () => _handleSocialSignup('Google'),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _SocialSignupButton(
-                            icon: Icons.apple,
-                            label: 'Apple',
-                            onPressed: () => _handleSocialSignup('Apple'),
-                          ),
-                        ),
-                      ],
-                    ),
                     const SizedBox(height: 32),
 
                     // Security Badge
@@ -676,10 +622,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
-                              ),
+                            Navigator.of(context).pushReplacementNamed(
+                              AppRoutes.login,
+                              arguments: widget.redirectRoute,
                             );
                           },
                           style: TextButton.styleFrom(
@@ -721,6 +666,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     String? Function(String?)? validator,
     TextInputType? keyboardType,
     TextCapitalization textCapitalization = TextCapitalization.none,
+    Iterable<String>? autofillHints,
+    TextInputAction? textInputAction,
     bool obscureText = false,
     bool isPassword = false,
     VoidCallback? onToggleVisibility,
@@ -744,6 +691,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           onChanged: onChanged,
           keyboardType: keyboardType,
           textCapitalization: textCapitalization,
+          autofillHints: autofillHints,
+          textInputAction: textInputAction,
+          autocorrect: !isPassword,
+          enableSuggestions: !isPassword,
           style: const TextStyle(fontSize: 15),
           decoration: InputDecoration(
             hintText: hintText,
@@ -756,6 +707,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ),
             suffixIcon: isPassword
                 ? IconButton(
+                    tooltip: obscureText ? 'Show password' : 'Hide password',
                     icon: Icon(
                       obscureText
                           ? Icons.visibility_outlined
@@ -810,47 +762,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
         ],
       ],
-    );
-  }
-}
-
-// Social Signup Button Widget
-class _SocialSignupButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-
-  const _SocialSignupButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: const BorderSide(color: AppColors.border, width: 1.5),
-        backgroundColor: Colors.transparent,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 20, color: AppColors.foreground),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.foreground,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

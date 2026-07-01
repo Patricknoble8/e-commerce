@@ -7,6 +7,7 @@ import '../../config/theme/typography.dart';
 import '../../providers/notifiers/auth_notifier.dart';
 import '../../widgets/profile/profile_image_picker.dart';
 import '../../widgets/buttons/buttons.dart';
+import '../../widgets/common/app_back_button.dart';
 
 /// Edit profile screen for updating user information
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -60,10 +61,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     setState(() => _isLoading = true);
 
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    ref
+    await ref
         .read(authProvider.notifier)
         .updateProfile(
           name: _nameController.text.trim(),
@@ -101,10 +99,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => _confirmExit(),
-        ),
+        leading: AppBackButton(onPressed: _confirmExit),
         title: Text(
           'Edit Profile',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),

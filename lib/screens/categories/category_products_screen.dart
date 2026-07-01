@@ -6,6 +6,7 @@ import '../../models/category.dart';
 import '../../models/product.dart';
 import '../../data/category_data.dart';
 import '../../providers/providers.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../product_detail/product_detail_screen.dart';
 
 // Shadcn color palette
@@ -22,7 +23,7 @@ const _mutedForeground = Color(0xFF71717A);
 const _border = Color(0xFFE4E4E7);
 const _destructive = Color(0xFFEF4444);
 
-enum SortOption { featured, priceLowToHigh, priceHighToLow, newest, topRated }
+enum SortOption { featured, priceLowToHigh, priceHighToLow, topRated }
 
 class CategoryProductsScreen extends ConsumerStatefulWidget {
   final Category category;
@@ -57,13 +58,9 @@ class _CategoryProductsScreenState
             pinned: true,
             backgroundColor: _card,
             surfaceTintColor: Colors.transparent,
-            leading: IconButton(
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-              color: _foreground,
+            leading: const AppBackButton(
+              foregroundColor: _foreground,
+              backgroundColor: _card,
             ),
             actions: [
               IconButton(
@@ -217,10 +214,6 @@ class _CategoryProductsScreenState
         break;
       case SortOption.topRated:
         products.sort((a, b) => b.rating.compareTo(a.rating));
-        break;
-      case SortOption.newest:
-        // For demo, reverse order to simulate newest
-        products = products.reversed.toList();
         break;
       case SortOption.featured:
         // Keep original order
@@ -647,11 +640,6 @@ class _CategoryProductsScreenState
               SortOption.topRated,
               Icons.thumb_up_rounded,
             ),
-            _buildSortOption(
-              'Newest',
-              SortOption.newest,
-              Icons.new_releases_rounded,
-            ),
             const SizedBox(height: 16),
           ],
         ),
@@ -757,7 +745,7 @@ class _CategoryProductsScreenState
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),

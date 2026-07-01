@@ -4,6 +4,7 @@ import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
 import '../../widgets/buttons/buttons.dart';
+import '../../widgets/common/app_back_button.dart';
 
 /// Model for return request
 class ReturnRequest {
@@ -80,10 +81,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.foreground),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: const AppBackButton(),
         title: Text(
           'Returns & Refunds',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -174,7 +172,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
+          colors: [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)],
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
@@ -183,7 +181,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
           Container(
             padding: EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: const Icon(
@@ -207,7 +205,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
                 Text(
                   '30-day free returns on all orders',
                   style: AppTypography.bodySmall.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -271,7 +269,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+                    errorBuilder: (_, _, _) => Container(
                       width: 60,
                       height: 60,
                       color: AppColors.muted,
@@ -366,7 +364,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Text(
@@ -529,7 +527,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
             Container(
               padding: EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.1),
+                color: AppColors.success.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -909,7 +907,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
       leading: Container(
         padding: EdgeInsets.all(AppSpacing.sm),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppRadius.sm),
         ),
         child: Icon(icon, color: AppColors.primary),

@@ -88,7 +88,7 @@ class _ReviewImageGalleryState extends State<ReviewImageGallery> {
                         ),
                       );
                     },
-                    errorBuilder: (_, __, ___) => Container(
+                    errorBuilder: (_, _, _) => Container(
                       padding: EdgeInsets.all(AppSpacing.xl),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -168,7 +168,7 @@ class _ReviewImageGalleryState extends State<ReviewImageGallery> {
                     scrollDirection: Axis.horizontal,
                     padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     itemCount: widget.images.length,
-                    separatorBuilder: (_, __) => SizedBox(width: AppSpacing.xs),
+                    separatorBuilder: (_, _) => SizedBox(width: AppSpacing.xs),
                     itemBuilder: (context, index) {
                       final isSelected = index == _currentIndex;
                       return GestureDetector(
@@ -199,7 +199,7 @@ class _ReviewImageGalleryState extends State<ReviewImageGallery> {
                               child: Image.network(
                                 widget.images[index],
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
+                                errorBuilder: (_, _, _) => Container(
                                   color: Colors.grey[800],
                                   child: Icon(
                                     Icons.image_not_supported,
@@ -280,9 +280,9 @@ class _ZoomableImageState extends State<ZoomableImage>
       // Zoom in
       final position = details.localPosition;
       final zoomed = Matrix4.identity()
-        ..translate(-position.dx, -position.dy)
-        ..scale(2.5)
-        ..translate(position.dx, position.dy);
+        ..translateByDouble(-position.dx, -position.dy, 0, 1)
+        ..scaleByDouble(2.5, 2.5, 2.5, 1)
+        ..translateByDouble(position.dx, position.dy, 0, 1);
 
       _animation = Matrix4Tween(begin: _controller.value, end: zoomed).animate(
         CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
@@ -317,7 +317,7 @@ class _ZoomableImageState extends State<ZoomableImage>
               ),
             );
           },
-          errorBuilder: (_, __, ___) => Container(
+          errorBuilder: (_, _, _) => Container(
             color: AppColors.backgroundMuted,
             child: Center(
               child: Icon(

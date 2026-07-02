@@ -18,6 +18,7 @@ class OrderDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppColors.bind(context);
     final order = ref.watch(singleOrderProvider(orderId));
 
     if (order == null) {
@@ -38,7 +39,7 @@ class OrderDetailScreen extends ConsumerWidget {
         leading: const AppBackButton(),
         title: Text(
           order.orderNumber,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.foreground,
             fontWeight: FontWeight.w600,
           ),
@@ -190,12 +191,12 @@ class OrderDetailScreen extends ConsumerWidget {
                     order.status != OrderStatus.cancelled)
                   Text(
                     'Estimated: ${DateFormat('MMM dd, yyyy').format(order.estimatedDelivery!)}',
-                    style: const TextStyle(color: AppColors.foregroundMuted),
+                    style: TextStyle(color: AppColors.foregroundMuted),
                   ),
                 if (order.deliveredAt != null)
                   Text(
                     'Delivered: ${DateFormat('MMM dd, yyyy').format(order.deliveredAt!)}',
-                    style: const TextStyle(color: AppColors.foregroundMuted),
+                    style: TextStyle(color: AppColors.foregroundMuted),
                   ),
               ],
             ),
@@ -275,7 +276,7 @@ class OrderDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Text(
                         DateFormat('MMM dd, hh:mm a').format(event.timestamp),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppColors.foregroundMuted,
                         ),
@@ -308,7 +309,7 @@ class OrderDetailScreen extends ConsumerWidget {
               color: AppColors.muted,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.local_shipping_outlined,
               color: AppColors.foreground,
             ),
@@ -325,7 +326,7 @@ class OrderDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   order.trackingNumber!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.foregroundMuted,
                     fontSize: 13,
                   ),
@@ -381,7 +382,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         child: Image.network(
                           item.product.imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const Icon(
+                          errorBuilder: (_, _, _) => Icon(
                             Icons.image_not_supported_outlined,
                             color: AppColors.foregroundMuted,
                           ),
@@ -402,7 +403,7 @@ class OrderDetailScreen extends ConsumerWidget {
                           const SizedBox(height: 4),
                           Text(
                             '${item.selectedColor} • Size ${item.selectedSize}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               color: AppColors.foregroundMuted,
                             ),
@@ -420,7 +421,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         const SizedBox(height: 2),
                         Text(
                           'Qty: ${item.quantity}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             color: AppColors.foregroundMuted,
                           ),
@@ -430,7 +431,7 @@ class OrderDetailScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              if (!isLast) const Divider(height: 1, color: AppColors.border),
+              if (!isLast) Divider(height: 1, color: AppColors.border),
             ],
           );
         }).toList(),
@@ -454,7 +455,7 @@ class OrderDetailScreen extends ConsumerWidget {
               color: AppColors.muted,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.location_on_outlined,
               color: AppColors.foreground,
             ),
@@ -471,7 +472,7 @@ class OrderDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   order.shippingAddress.fullAddress,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.foregroundMuted,
                     fontSize: 13,
                   ),
@@ -480,7 +481,7 @@ class OrderDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     order.shippingAddress.phone!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.foregroundMuted,
                       fontSize: 13,
                     ),
@@ -526,7 +527,7 @@ class OrderDetailScreen extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: 8),
-          const Divider(color: AppColors.border),
+          Divider(color: AppColors.border),
           const SizedBox(height: 8),
           _buildSummaryRow(
             'Total',
@@ -536,7 +537,7 @@ class OrderDetailScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.credit_card,
                 size: 18,
                 color: AppColors.foregroundMuted,
@@ -544,7 +545,7 @@ class OrderDetailScreen extends ConsumerWidget {
               const SizedBox(width: 8),
               Text(
                 'Paid with ${order.paymentMethod}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.foregroundMuted,
                   fontSize: 13,
                 ),
@@ -617,7 +618,7 @@ class OrderDetailScreen extends ConsumerWidget {
                 onPressed: () => _reorderItems(context, ref, order),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: AppColors.border),
+                  side: BorderSide(color: AppColors.border),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -631,7 +632,7 @@ class OrderDetailScreen extends ConsumerWidget {
                 label: const Text('Need Help?'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: AppColors.border),
+                  side: BorderSide(color: AppColors.border),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

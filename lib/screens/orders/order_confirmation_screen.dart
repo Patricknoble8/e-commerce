@@ -16,6 +16,7 @@ class OrderConfirmationScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppColors.bind(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -364,7 +365,7 @@ class OrderConfirmationScreen extends ConsumerWidget {
           },
           style: OutlinedButton.styleFrom(
             minimumSize: const Size(double.infinity, 48),
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: AppColors.border),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),

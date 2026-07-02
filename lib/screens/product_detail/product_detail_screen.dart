@@ -106,6 +106,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final ratingSummary = ref.watch(
       productRatingSummaryProvider(widget.product.id),
     );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../config/theme/colors.dart';
 import '../../config/theme/spacing.dart';
 import '../../config/theme/typography.dart';
 import '../../widgets/common/app_back_button.dart';
@@ -92,15 +91,17 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final notifications = ref.watch(notificationsProvider);
     final unreadCount = ref.watch(unreadCountProvider);
     final filteredNotifications = _getFilteredNotifications(notifications);
     final groupedNotifications = _groupByDate(filteredNotifications);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.surface,
         elevation: 0,
         leading: const AppBackButton(),
         title: Row(
@@ -108,7 +109,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           children: [
             Text(
               'Notifications',
-              style: AppTypography.h4.copyWith(color: AppColors.foreground),
+              style: AppTypography.h4.copyWith(color: colors.onSurface),
             ),
             if (unreadCount > 0)
               Container(
@@ -181,7 +182,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                             child: Text(
                               sectionKey,
                               style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.foregroundSecondary,
+                                color: colors.onSurfaceVariant,
                                 fontWeight: AppTypography.semiBold,
                               ),
                             ),
@@ -276,24 +277,31 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
     bool isSelected,
     VoidCallback onTap,
   ) {
+    final colors = Theme.of(context).colorScheme;
+
     return FilterChip(
       label: Text('$label ($count)'),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: AppColors.border.withValues(alpha: 0.3),
-      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+      showCheckmark: isSelected,
+      checkmarkColor: colors.onPrimary,
+      backgroundColor: colors.surfaceContainerHighest,
+      selectedColor: colors.primary,
       labelStyle: AppTypography.bodySmall.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.foregroundSecondary,
-        fontWeight: isSelected ? AppTypography.semiBold : AppTypography.regular,
+        color: isSelected ? colors.onPrimary : colors.onSurfaceVariant,
+        fontWeight: AppTypography.semiBold,
       ),
       side: BorderSide(
-        color: isSelected ? AppColors.primary : Colors.transparent,
-        width: isSelected ? 1.5 : 0,
+        color: isSelected ? colors.primary : colors.outlineVariant,
+        width: 1,
       ),
     );
   }
 
   Widget _buildNotificationCard(AppNotification notification) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Dismissible(
       key: Key(notification.id),
       direction: DismissDirection.endToStart,
@@ -331,14 +339,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
           decoration: BoxDecoration(
             border: Border.all(
               color: !notification.isRead
-                  ? AppColors.primary.withValues(alpha: 0.5)
-                  : AppColors.border,
+                  ? colors.primary.withValues(alpha: 0.55)
+                  : colors.outlineVariant,
               width: !notification.isRead ? 1.5 : 1,
             ),
             borderRadius: BorderRadius.circular(12),
             color: !notification.isRead
-                ? AppColors.primary.withValues(alpha: 0.05)
-                : Colors.white,
+                ? colors.primary.withValues(alpha: 0.07)
+                : colors.surfaceContainerLow,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,7 +389,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                     child: Text(
                                       notification.title,
                                       style: AppTypography.bodyMedium.copyWith(
-                                        color: AppColors.foreground,
+                                        color: colors.onSurface,
                                         fontWeight: AppTypography.semiBold,
                                       ),
                                       maxLines: 1,
@@ -401,7 +409,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                                 width: 8,
                                 height: 8,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary,
+                                  // Keep the unread marker visible in either theme.
+                                  color: colors.primary,
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -411,7 +420,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         Text(
                           notification.message,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.foregroundSecondary,
+                            color: colors.onSurfaceVariant,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -432,7 +441,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                     vertical: AppSpacing.sm,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: colors.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -443,14 +452,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                             ? 'Requested Amount'
                             : 'Amount',
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.foregroundSecondary,
+                          color: colors.onSurfaceVariant,
                           fontWeight: AppTypography.medium,
                         ),
                       ),
                       Text(
                         '\$${notification.amount!.toStringAsFixed(2)}',
                         style: AppTypography.h4.copyWith(
-                          color: AppColors.primary,
+                          color: colors.onSurface,
                           fontWeight: AppTypography.bold,
                         ),
                       ),
@@ -477,7 +486,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                       child: Text(
                         'From: ${notification.senderName}',
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.foregroundSecondary,
+                          color: colors.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -499,7 +508,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         icon: const Icon(Icons.payment, size: 18),
                         label: const Text('Pay Now'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: colors.primary,
+                          foregroundColor: colors.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -524,6 +534,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         icon: const Icon(Icons.close, size: 18),
                         label: const Text('Decline'),
                         style: OutlinedButton.styleFrom(
+                          foregroundColor: colors.onSurface,
+                          side: BorderSide(color: colors.outline),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -541,6 +553,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                         icon: const Icon(Icons.close, size: 18),
                         label: const Text('Dismiss'),
                         style: OutlinedButton.styleFrom(
+                          foregroundColor: colors.onSurface,
+                          side: BorderSide(color: colors.outline),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -556,7 +570,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
               Text(
                 _formatTimeAgo(notification.timestamp),
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.foregroundSecondary,
+                  color: colors.onSurfaceVariant,
                   fontSize: 12,
                 ),
               ),
@@ -568,29 +582,37 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   }
 
   Widget _buildStatusBadge(String status) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     Color backgroundColor;
     Color textColor;
     String label;
 
     switch (status) {
       case 'completed':
-        backgroundColor = Colors.green.withValues(alpha: 0.1);
-        textColor = Colors.green;
+        backgroundColor = isDark
+            ? const Color(0xFF14532D)
+            : const Color(0xFFDCFCE7);
+        textColor = isDark ? const Color(0xFFBBF7D0) : const Color(0xFF166534);
         label = 'Completed';
         break;
       case 'pending':
-        backgroundColor = Colors.orange.withValues(alpha: 0.1);
-        textColor = Colors.orange;
+        backgroundColor = isDark
+            ? const Color(0xFF78350F)
+            : const Color(0xFFFFF7ED);
+        textColor = isDark ? const Color(0xFFFDE68A) : const Color(0xFF9A3412);
         label = 'Pending';
         break;
       case 'failed':
-        backgroundColor = Colors.red.withValues(alpha: 0.1);
-        textColor = Colors.red;
+        backgroundColor = isDark
+            ? const Color(0xFF7F1D1D)
+            : const Color(0xFFFEE2E2);
+        textColor = isDark ? const Color(0xFFFECACA) : const Color(0xFF991B1B);
         label = 'Failed';
         break;
       default:
-        backgroundColor = AppColors.border.withValues(alpha: 0.3);
-        textColor = AppColors.foregroundSecondary;
+        final colors = Theme.of(context).colorScheme;
+        backgroundColor = colors.surfaceContainerHighest;
+        textColor = colors.onSurfaceVariant;
         label = status;
     }
 
@@ -615,6 +637,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   }
 
   Widget _buildEmptyState() {
+    final colors = Theme.of(context).colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -623,19 +647,19 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.border.withValues(alpha: 0.2),
+              color: colors.surfaceContainerHighest,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.notifications_none,
               size: 40,
-              color: AppColors.foregroundSecondary,
+              color: colors.onSurfaceVariant,
             ),
           ),
           SizedBox(height: AppSpacing.lg),
           Text(
             'No Notifications',
-            style: AppTypography.h4.copyWith(color: AppColors.foreground),
+            style: AppTypography.h4.copyWith(color: colors.onSurface),
           ),
           SizedBox(height: AppSpacing.sm),
           Text(
@@ -643,7 +667,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
                 ? 'You\'re all caught up!'
                 : 'No notifications in this category',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.foregroundSecondary,
+              color: colors.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -655,120 +679,131 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen>
   void _showPaymentConfirmation(AppNotification notification) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Confirm Payment',
-              style: AppTypography.h4.copyWith(color: AppColors.foreground),
-            ),
-            SizedBox(height: AppSpacing.md),
-            Container(
-              padding: EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: AppColors.border.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+      builder: (context) {
+        final colors = Theme.of(context).colorScheme;
+
+        return Container(
+          padding: EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Confirm Payment',
+                style: AppTypography.h4.copyWith(color: colors.onSurface),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(height: AppSpacing.md),
+              Container(
+                padding: EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: colors.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Amount',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                        Text(
+                          '\$${notification.amount!.toStringAsFixed(2)}',
+                          style: AppTypography.h4.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: AppTypography.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: AppSpacing.sm),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'To',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                        Text(
+                          notification.senderName ?? 'Unknown',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: colors.onSurface,
+                            fontWeight: AppTypography.semiBold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: AppSpacing.lg),
+              Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Amount',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.foregroundSecondary,
-                        ),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colors.onSurface,
                       ),
-                      Text(
-                        '\$${notification.amount!.toStringAsFixed(2)}',
-                        style: AppTypography.h4.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: AppTypography.bold,
-                        ),
-                      ),
-                    ],
+                      child: const Text('Cancel'),
+                    ),
                   ),
-                  SizedBox(height: AppSpacing.sm),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'To',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.foregroundSecondary,
-                        ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        ref
+                            .read(notificationsProvider.notifier)
+                            .acceptPaymentRequest(notification.id);
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Payment processed successfully!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colors.primary,
+                        foregroundColor: colors.onPrimary,
                       ),
-                      Text(
-                        notification.senderName ?? 'Unknown',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.foreground,
-                          fontWeight: AppTypography.semiBold,
-                        ),
-                      ),
-                    ],
+                      child: const Text('Confirm Payment'),
+                    ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
-                  ),
-                ),
-                SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref
-                          .read(notificationsProvider.notifier)
-                          .acceptPaymentRequest(notification.id);
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Payment processed successfully!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                    ),
-                    child: const Text('Confirm Payment'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Color _getNotificationColor(String type) {
+    final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     switch (type) {
       case 'payment_received':
-        return Colors.green;
+        return isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
       case 'payment_request':
-        return Colors.orange;
+        return isDark ? const Color(0xFFFBBF24) : const Color(0xFFC2410C);
       case 'payment_completed':
-        return AppColors.primary;
+        return colors.primary;
       case 'system':
-        return Colors.blue;
+        return isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB);
       default:
-        return AppColors.primary;
+        return colors.primary;
     }
   }
 

@@ -37,10 +37,12 @@ class AddressManagementScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddAddressDialog(context, ref),
         backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.add, color: Colors.white),
+        icon: Icon(Icons.add, color: AppColors.primaryForeground),
         label: Text(
           'Add Address',
-          style: AppTypography.labelLarge.copyWith(color: Colors.white),
+          style: AppTypography.labelLarge.copyWith(
+            color: AppColors.primaryForeground,
+          ),
         ),
       ),
     );
@@ -228,6 +230,7 @@ class _AddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       margin: EdgeInsets.only(bottom: AppSpacing.md),
       decoration: BoxDecoration(
@@ -289,7 +292,7 @@ class _AddressCard extends StatelessWidget {
                               child: Text(
                                 'Default',
                                 style: AppTypography.labelSmall.copyWith(
-                                  color: Colors.white,
+                                  color: AppColors.primaryForeground,
                                   fontWeight: AppTypography.semiBold,
                                 ),
                               ),
@@ -450,10 +453,11 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -620,6 +624,8 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
         SizedBox(height: AppSpacing.xs),
         TextFormField(
           controller: controller,
+          cursorColor: AppColors.primary,
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
           keyboardType: keyboardType,
           validator: validator,
           decoration: InputDecoration(
@@ -631,15 +637,15 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
             fillColor: AppColors.background,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             contentPadding: EdgeInsets.symmetric(
               horizontal: AppSpacing.md,

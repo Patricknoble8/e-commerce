@@ -20,6 +20,7 @@ class CartScreen extends ConsumerStatefulWidget {
 class _CartScreenState extends ConsumerState<CartScreen> {
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -32,7 +33,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.notifications_outlined,
               color: AppColors.foreground,
             ),
@@ -144,7 +145,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 item.product.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return const Icon(
+                  return Icon(
                     Icons.image_outlined,
                     size: 32,
                     color: AppColors.mutedForeground,

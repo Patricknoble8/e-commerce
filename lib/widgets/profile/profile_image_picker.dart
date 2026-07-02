@@ -12,6 +12,7 @@ class ProfileImagePicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppColors.bind(context);
     final imageState = ref.watch(profileImageProvider);
 
     return Stack(
@@ -50,7 +51,7 @@ class ProfileImagePicker extends ConsumerWidget {
                 child: Icon(
                   Icons.camera_alt,
                   size: size * 0.18,
-                  color: Colors.white,
+                  color: AppColors.primaryForeground,
                 ),
               ),
             ),
@@ -150,7 +151,7 @@ class ProfileImagePicker extends ConsumerWidget {
                 ),
               ),
 
-              const Text(
+              Text(
                 'Change Profile Photo',
                 style: TextStyle(
                   fontSize: 18,
@@ -262,22 +263,23 @@ class ProfileImagePicker extends ConsumerWidget {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Enter Image URL',
           style: TextStyle(color: AppColors.foreground),
         ),
         content: TextField(
           controller: controller,
+          cursorColor: AppColors.primary,
           decoration: InputDecoration(
             hintText: 'https://example.com/image.jpg',
-            hintStyle: const TextStyle(color: AppColors.mutedForeground),
+            hintStyle: TextStyle(color: AppColors.mutedForeground),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
           ),
-          style: const TextStyle(color: AppColors.foreground),
+          style: TextStyle(color: AppColors.foreground),
           keyboardType: TextInputType.url,
         ),
         actions: [
@@ -299,11 +301,12 @@ class ProfileImagePicker extends ConsumerWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.primaryForeground,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Save', style: TextStyle(color: Colors.white)),
+            child: const Text('Save'),
           ),
         ],
       ),

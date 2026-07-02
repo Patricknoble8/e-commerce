@@ -30,6 +30,7 @@ class InputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,6 +46,7 @@ class InputField extends StatelessWidget {
         TextField(
           controller: value != null ? TextEditingController(text: value) : null,
           onChanged: onChanged,
+          cursorColor: AppColors.primary,
           keyboardType: keyboardType,
           obscureText: obscureText,
           maxLines: maxLines,
@@ -64,14 +66,14 @@ class InputField extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(
+              borderSide: BorderSide(
                 color: AppColors.border,
                 width: AppBorderWidth.thin,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(
+              borderSide: BorderSide(
                 color: AppColors.border,
                 width: AppBorderWidth.thin,
               ),
@@ -105,17 +107,18 @@ class SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return InputField(
       placeholder: placeholder ?? 'Search...',
       onChanged: onChanged,
-      prefixIcon: const Icon(
+      prefixIcon: Icon(
         Icons.search,
         size: 20,
         color: AppColors.mutedForeground,
       ),
       suffixIcon: onClear != null
           ? IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.close,
                 size: 20,
                 color: AppColors.mutedForeground,

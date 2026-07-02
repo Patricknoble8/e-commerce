@@ -74,6 +74,7 @@ class ReturnsRefundsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppColors.bind(context);
     final returns = ref.watch(returnRequestsProvider);
 
     return Scaffold(
@@ -181,12 +182,12 @@ class ReturnsRefundsScreen extends ConsumerWidget {
           Container(
             padding: EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: AppColors.primaryForeground.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.assignment_return,
-              color: Colors.white,
+              color: AppColors.primaryForeground,
               size: 28,
             ),
           ),
@@ -198,14 +199,14 @@ class ReturnsRefundsScreen extends ConsumerWidget {
                 Text(
                   'Easy Returns',
                   style: AppTypography.labelLarge.copyWith(
-                    color: Colors.white,
+                    color: AppColors.primaryForeground,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   '30-day free returns on all orders',
                   style: AppTypography.bodySmall.copyWith(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: AppColors.primaryForeground.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -454,6 +455,10 @@ class ReturnsRefundsScreen extends ConsumerWidget {
               ),
               SizedBox(height: AppSpacing.md),
               TextField(
+                cursorColor: AppColors.primary,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.foreground,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Order ID',
                   hintText: 'Enter your order ID',
@@ -483,7 +488,9 @@ class ReturnsRefundsScreen extends ConsumerWidget {
                     },
                     selectedColor: AppColors.primary,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.foreground,
+                      color: isSelected
+                          ? AppColors.primaryForeground
+                          : AppColors.foreground,
                     ),
                   );
                 }).toList(),
@@ -491,6 +498,10 @@ class ReturnsRefundsScreen extends ConsumerWidget {
               SizedBox(height: AppSpacing.md),
               TextField(
                 maxLines: 3,
+                cursorColor: AppColors.primary,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.foreground,
+                ),
                 decoration: InputDecoration(
                   labelText: 'Additional Comments (Optional)',
                   border: OutlineInputBorder(

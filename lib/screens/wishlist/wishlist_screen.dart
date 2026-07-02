@@ -114,6 +114,7 @@ class WishlistScreen extends ConsumerWidget {
 class _EmptyWishlist extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Center(
       child: Padding(
         padding: EdgeInsets.all(AppSpacing.xl),
@@ -151,7 +152,7 @@ class _EmptyWishlist extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.primaryForeground,
                 padding: EdgeInsets.symmetric(
                   horizontal: AppSpacing.xl,
                   vertical: AppSpacing.md,

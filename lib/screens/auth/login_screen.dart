@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/navigation/app_routes.dart';
 import '../../config/theme/colors.dart';
+import '../../config/theme/typography.dart';
 import '../../providers/notifiers/auth_notifier.dart';
 import '../../utils/validators.dart';
 
@@ -115,13 +116,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Enter your email address and we\'ll send you a link to reset your password.',
               style: TextStyle(color: AppColors.foregroundMuted),
             ),
             const SizedBox(height: 16),
             TextField(
               keyboardType: TextInputType.emailAddress,
+              cursorColor: AppColors.primary,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.foreground,
+              ),
               decoration: InputDecoration(
                 hintText: 'Enter your email',
                 prefixIcon: const Icon(Icons.email_outlined, size: 20),
@@ -169,7 +174,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.primaryForeground,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -183,6 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final authState = ref.watch(authProvider);
     final canPop = Navigator.of(context).canPop();
     final size = MediaQuery.of(context).size;
@@ -196,7 +202,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         automaticallyImplyLeading: false,
         leading: canPop
             ? IconButton(
-                icon: const Icon(Icons.close, color: AppColors.foreground),
+                icon: Icon(Icons.close, color: AppColors.foreground),
                 onPressed: () => Navigator.of(context).pop(),
               )
             : null,
@@ -226,14 +232,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         color: AppColors.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.lock_person_rounded,
                         size: 48,
                         color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 32),
-                    const Text(
+                    Text(
                       'Welcome Back',
                       style: TextStyle(
                         fontSize: 32,
@@ -244,7 +250,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Enter your credentials to access your account',
                       style: TextStyle(
                         fontSize: 15,
@@ -309,7 +315,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Email',
                           style: TextStyle(
                             fontSize: 14,
@@ -325,13 +331,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           autofillHints: const [AutofillHints.email],
                           autocorrect: false,
                           onChanged: _validateEmail,
-                          style: const TextStyle(fontSize: 15),
+                          cursorColor: AppColors.primary,
+                          style: TextStyle(
+                            color: AppColors.foreground,
+                            fontSize: 15,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Enter your email address',
                             hintStyle: TextStyle(
-                              color: AppColors.foregroundMuted.withValues(
-                                alpha: 0.5,
-                              ),
+                              color: AppColors.mutedForeground,
                             ),
                             prefixIcon: const Padding(
                               padding: EdgeInsets.all(12),
@@ -411,7 +419,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Password',
                           style: TextStyle(
                             fontSize: 14,
@@ -431,13 +439,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             if (!authState.isLoading) _handleLogin();
                           },
                           onChanged: _validatePassword,
-                          style: const TextStyle(fontSize: 15),
+                          cursorColor: AppColors.primary,
+                          style: TextStyle(
+                            color: AppColors.foreground,
+                            fontSize: 15,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Enter your password',
                             hintStyle: TextStyle(
-                              color: AppColors.foregroundMuted.withValues(
-                                alpha: 0.5,
-                              ),
+                              color: AppColors.mutedForeground,
                             ),
                             prefixIcon: const Padding(
                               padding: EdgeInsets.all(12),
@@ -537,7 +547,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 'Remember me',
                                 style: TextStyle(
                                   fontSize: 14,
@@ -558,7 +568,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: const Text(
+                          child: Text(
                             'Forgot password?',
                             style: TextStyle(
                               color: AppColors.primary,
@@ -640,7 +650,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           "Don't have an account? ",
                           style: TextStyle(
                             color: AppColors.foregroundMuted,
@@ -662,7 +672,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: const Text(
+                          child: Text(
                             'Sign Up',
                             style: TextStyle(
                               color: AppColors.primary,

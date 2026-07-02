@@ -28,6 +28,7 @@ class _ProductReviewsScreenState extends ConsumerState<ProductReviewsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final reviewState = ref.watch(reviewProvider);
     final summary = ref.watch(productRatingSummaryProvider(widget.product.id));
     final currentUserId = ref.watch(currentUserIdProvider);
@@ -345,6 +346,7 @@ class _ReportReviewBottomSheetState extends State<ReportReviewBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
@@ -413,6 +415,7 @@ class ReviewCardShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(

@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../config/theme/colors.dart';
+
+Color get _shimmerBase => AppColors.muted;
+Color get _shimmerHighlight => Color.alphaBlend(
+  AppColors.foreground.withValues(alpha: 0.08),
+  AppColors.muted,
+);
 
 /// Professional shimmer loading widget for skeleton screens
 class ShimmerLoading extends StatelessWidget {
@@ -20,14 +27,15 @@ class ShimmerLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Shimmer.fromColors(
-      baseColor: baseColor ?? Colors.grey[300]!,
-      highlightColor: highlightColor ?? Colors.grey[100]!,
+      baseColor: baseColor ?? _shimmerBase,
+      highlightColor: highlightColor ?? _shimmerHighlight,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),
@@ -39,21 +47,18 @@ class ShimmerLoading extends StatelessWidget {
 class ProductCardShimmer extends StatelessWidget {
   const ProductCardShimmer({super.key});
 
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _border = Color(0xFFE4E4E7);
-  static const Color _muted = Color(0xFFF4F4F5);
-
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       decoration: BoxDecoration(
-        color: _card,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _border),
+        border: Border.all(color: AppColors.border),
       ),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
+        baseColor: _shimmerBase,
+        highlightColor: _shimmerHighlight,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -61,7 +66,7 @@ class ProductCardShimmer extends StatelessWidget {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  color: _muted,
+                  color: AppColors.muted,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(11),
                   ),
@@ -79,7 +84,7 @@ class ProductCardShimmer extends StatelessWidget {
                       width: 50,
                       height: 10,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.card,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -88,7 +93,7 @@ class ProductCardShimmer extends StatelessWidget {
                       width: double.infinity,
                       height: 14,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.card,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -100,7 +105,7 @@ class ProductCardShimmer extends StatelessWidget {
                           width: 60,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.card,
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -108,7 +113,7 @@ class ProductCardShimmer extends StatelessWidget {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.card,
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -131,9 +136,10 @@ class CategoryCardShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: _shimmerBase,
+      highlightColor: _shimmerHighlight,
       child: SizedBox(
         width: 85,
         child: Column(
@@ -142,7 +148,7 @@ class CategoryCardShimmer extends StatelessWidget {
               width: 68,
               height: 68,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card,
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
@@ -151,7 +157,7 @@ class CategoryCardShimmer extends StatelessWidget {
               width: 50,
               height: 12,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -168,14 +174,15 @@ class HeroCarouselShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: _shimmerBase,
+      highlightColor: _shimmerHighlight,
       child: Container(
         height: 180,
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(16),
         ),
       ),
@@ -191,16 +198,17 @@ class ListItemShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: _shimmerBase,
+      highlightColor: _shimmerHighlight,
       child: Container(
         height: height,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
+          border: Border.all(color: AppColors.border),
         ),
         child: Row(
           children: [
@@ -208,7 +216,7 @@ class ListItemShimmer extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.muted,
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
@@ -222,7 +230,7 @@ class ListItemShimmer extends StatelessWidget {
                     width: double.infinity,
                     height: 14,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: AppColors.muted,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -231,7 +239,7 @@ class ListItemShimmer extends StatelessWidget {
                     width: 100,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: Colors.grey[300],
+                      color: AppColors.muted,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

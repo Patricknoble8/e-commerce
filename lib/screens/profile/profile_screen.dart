@@ -9,6 +9,7 @@ import '../../providers/notifiers/profile_notifier.dart';
 import '../../providers/notifiers/product_notifier.dart';
 import '../../providers/notifiers/notifications_notifier.dart';
 import '../../providers/notifiers/auth_notifier.dart';
+import '../../widgets/common/app_back_button.dart';
 import '../../widgets/profile/profile_image_picker.dart';
 import '../settings/size_preferences_screen.dart';
 import '../settings/security_settings_screen.dart';
@@ -35,6 +36,17 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
+        leading: AppBackButton(
+          onPressed: () {
+            final navigator = Navigator.of(context);
+            if (navigator.canPop()) {
+              navigator.pop();
+              return;
+            }
+
+            navigator.pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+          },
+        ),
         title: Text(
           'Profile',
           style: AppTypography.h4.copyWith(color: AppColors.foreground),
@@ -291,6 +303,7 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       margin: EdgeInsets.all(AppSpacing.md),
       padding: EdgeInsets.all(AppSpacing.lg),
@@ -402,6 +415,7 @@ class _StatisticsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
       padding: EdgeInsets.all(AppSpacing.lg),
@@ -449,6 +463,7 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Column(
       children: [
         Icon(icon, size: 24, color: AppColors.primary),
@@ -479,6 +494,7 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
@@ -514,6 +530,7 @@ class _MenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       margin: EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
@@ -561,7 +578,7 @@ class _MenuItem extends StatelessWidget {
                 child: Text(
                   badge!,
                   style: AppTypography.labelSmall.copyWith(
-                    color: Colors.white,
+                    color: AppColors.primaryForeground,
                     fontWeight: AppTypography.semiBold,
                   ),
                 ),

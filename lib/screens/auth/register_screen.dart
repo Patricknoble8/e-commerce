@@ -191,6 +191,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final authState = ref.watch(authProvider);
     final size = MediaQuery.of(context).size;
     final isMobile = size.width < 600;
@@ -201,7 +202,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.foreground),
+          icon: Icon(Icons.close, color: AppColors.foreground),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -228,14 +229,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         color: AppColors.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.person_add_alt_1_rounded,
                         size: 48,
                         color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(height: 32),
-                    const Text(
+                    Text(
                       'Create Account',
                       style: TextStyle(
                         fontSize: 32,
@@ -246,7 +247,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Join us today and start your shopping journey',
                       style: TextStyle(
                         fontSize: 15,
@@ -348,7 +349,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Password',
                           style: TextStyle(
                             fontSize: 14,
@@ -365,13 +366,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           enableSuggestions: false,
                           autocorrect: false,
                           onChanged: _validatePassword,
-                          style: const TextStyle(fontSize: 15),
+                          cursorColor: AppColors.primary,
+                          style: TextStyle(
+                            color: AppColors.foreground,
+                            fontSize: 15,
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Create a strong password',
                             hintStyle: TextStyle(
-                              color: AppColors.foregroundMuted.withValues(
-                                alpha: 0.5,
-                              ),
+                              color: AppColors.mutedForeground,
                             ),
                             prefixIcon: const Padding(
                               padding: EdgeInsets.all(12),
@@ -508,7 +511,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: RichText(
-                                  text: const TextSpan(
+                                  text: TextSpan(
                                     style: TextStyle(
                                       color: AppColors.foreground,
                                       fontSize: 14,
@@ -613,7 +616,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'Already have an account? ',
                           style: TextStyle(
                             color: AppColors.foregroundMuted,
@@ -635,7 +638,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: const Text(
+                          child: Text(
                             'Sign In',
                             style: TextStyle(
                               color: AppColors.primary,
@@ -678,7 +681,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.foreground,
@@ -695,12 +698,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           textInputAction: textInputAction,
           autocorrect: !isPassword,
           enableSuggestions: !isPassword,
-          style: const TextStyle(fontSize: 15),
+          cursorColor: AppColors.primary,
+          style: TextStyle(color: AppColors.foreground, fontSize: 15),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(
-              color: AppColors.foregroundMuted.withValues(alpha: 0.5),
-            ),
+            hintStyle: TextStyle(color: AppColors.mutedForeground),
             prefixIcon: Padding(
               padding: const EdgeInsets.all(12),
               child: Icon(prefixIcon, size: 20),

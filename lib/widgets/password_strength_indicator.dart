@@ -76,6 +76,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     if (password.isEmpty) return const SizedBox.shrink();
 
     final strength = _calculateStrength();
@@ -135,7 +136,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Password must contain:',
           style: TextStyle(
             fontSize: 12,
@@ -171,6 +172,7 @@ class _RequirementItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Row(

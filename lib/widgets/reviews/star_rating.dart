@@ -23,6 +23,7 @@ class StarRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: alignment,
@@ -120,6 +121,7 @@ class _StarRatingInputState extends State<StarRatingInput> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
@@ -170,6 +172,7 @@ class RatingDistribution extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,7 +181,7 @@ class RatingDistribution extends StatelessWidget {
           children: [
             Text(
               averageRating.toStringAsFixed(1),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
                 color: AppColors.foreground,
@@ -302,6 +305,7 @@ class AnimatedFractionallySizedBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return TweenAnimationBuilder<double>(
       duration: duration,
       tween: Tween(begin: 0, end: widthFactor),

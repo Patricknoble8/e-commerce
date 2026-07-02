@@ -59,6 +59,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final images = widget.images.isNotEmpty
         ? widget.images
         : ['assets/images/placeholder.png'];
@@ -257,6 +258,7 @@ class StockIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     Color color;
     String text;
     IconData icon;
@@ -313,6 +315,7 @@ class PriceDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final hasDiscount = originalPrice != null && originalPrice! > price;
 
     return Row(
@@ -385,6 +388,7 @@ class EnhancedColorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -510,6 +514,7 @@ class EnhancedSizeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -615,6 +620,7 @@ class StickyAddToCartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(

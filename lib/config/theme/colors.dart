@@ -1,8 +1,81 @@
 import 'package:flutter/material.dart';
 
-/// App-wide color palette following shadcn/ui design system
-/// Focus on muted, neutral colors with subtle accents
-class AppColors {
+/// Adaptive compatibility palette used by existing screens and components.
+///
+/// New widgets should prefer `Theme.of(context).colorScheme`. This palette
+/// keeps legacy `AppColors` consumers synchronized with the effective app
+/// brightness so Light, Dark, and System modes apply consistently everywhere.
+abstract final class AppColors {
+  static Brightness _brightness = Brightness.light;
+
+  static bool get _isDark => _brightness == Brightness.dark;
+
+  static void useBrightness(Brightness brightness) {
+    _brightness = brightness;
+  }
+
+  /// Registers the calling widget as a theme dependent and synchronizes the
+  /// compatibility palette before any legacy color is resolved.
+  static void bind(BuildContext context) {
+    useBrightness(Theme.of(context).brightness);
+  }
+
+  static Color get background =>
+      _isDark ? AppColorsDark.background : AppColorsLight.background;
+  static Color get backgroundSecondary => _isDark
+      ? AppColorsDark.backgroundSecondary
+      : AppColorsLight.backgroundSecondary;
+  static Color get backgroundMuted =>
+      _isDark ? AppColorsDark.backgroundMuted : AppColorsLight.backgroundMuted;
+
+  static Color get foreground =>
+      _isDark ? AppColorsDark.foreground : AppColorsLight.foreground;
+  static Color get foregroundSecondary => _isDark
+      ? AppColorsDark.foregroundSecondary
+      : AppColorsLight.foregroundSecondary;
+  static Color get foregroundMuted =>
+      _isDark ? AppColorsDark.foregroundMuted : AppColorsLight.foregroundMuted;
+
+  static Color get primary =>
+      _isDark ? AppColorsDark.primary : AppColorsLight.primary;
+  static Color get primaryHover =>
+      _isDark ? AppColorsDark.primaryHover : AppColorsLight.primaryHover;
+  static Color get primaryForeground => _isDark
+      ? AppColorsDark.primaryForeground
+      : AppColorsLight.primaryForeground;
+
+  static Color get secondary =>
+      _isDark ? AppColorsDark.secondary : AppColorsLight.secondary;
+  static Color get secondaryHover =>
+      _isDark ? AppColorsDark.secondaryHover : AppColorsLight.secondaryHover;
+  static Color get secondaryForeground => _isDark
+      ? AppColorsDark.secondaryForeground
+      : AppColorsLight.secondaryForeground;
+
+  static Color get border =>
+      _isDark ? AppColorsDark.border : AppColorsLight.border;
+  static Color get borderHover =>
+      _isDark ? AppColorsDark.borderHover : AppColorsLight.borderHover;
+
+  static const ring = Color(0xFF3B82F6);
+  static const accent = Color(0xFF3B82F6);
+  static const accentForeground = Color(0xFFFFFFFF);
+  static const success = Color(0xFF10B981);
+  static const error = Color(0xFFEF4444);
+  static const warning = Color(0xFFF59E0B);
+  static const destructive = Color(0xFFEF4444);
+
+  static Color get card => _isDark ? AppColorsDark.card : AppColorsLight.card;
+  static Color get cardForeground =>
+      _isDark ? AppColorsDark.cardForeground : AppColorsLight.cardForeground;
+  static Color get muted =>
+      _isDark ? AppColorsDark.muted : AppColorsLight.muted;
+  static Color get mutedForeground =>
+      _isDark ? AppColorsDark.mutedForeground : AppColorsLight.mutedForeground;
+}
+
+/// Fixed light palette used to build [ThemeData] for light mode.
+abstract final class AppColorsLight {
   // ============ LIGHT THEME COLORS ============
 
   // Background colors

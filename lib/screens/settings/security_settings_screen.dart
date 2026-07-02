@@ -24,6 +24,7 @@ class _SecuritySettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -334,7 +335,10 @@ class _SecuritySettingsScreenState
                 Navigator.pop(context);
                 _showSuccessSnackbar('Password changed successfully');
               },
-              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.primaryForeground,
+              ),
               child: const Text('Change Password'),
             ),
           ],
@@ -352,6 +356,8 @@ class _SecuritySettingsScreenState
     return TextField(
       controller: controller,
       obscureText: obscure,
+      cursorColor: AppColors.primary,
+      style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(
@@ -446,6 +452,11 @@ class _SecuritySettingsScreenState
             ),
             SizedBox(height: AppSpacing.md),
             TextField(
+              cursorColor: AppColors.primary,
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.foreground,
+                letterSpacing: 4,
+              ),
               decoration: InputDecoration(
                 labelText: 'Enter verification code',
                 border: OutlineInputBorder(

@@ -21,7 +21,7 @@ class OrderHistoryScreen extends ConsumerWidget {
         backgroundColor: AppColors.background,
         elevation: 0,
         leading: const AppBackButton(),
-        title: const Text(
+        title: Text(
           'My Orders',
           style: TextStyle(
             color: AppColors.foreground,
@@ -33,7 +33,7 @@ class OrderHistoryScreen extends ConsumerWidget {
         children: [
           // Filter tabs
           _buildFilterTabs(ref, orderState.filter),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: AppColors.border),
 
           // Order list
           Expanded(
@@ -127,14 +127,14 @@ class OrderHistoryScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             message,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
               color: AppColors.foregroundMuted,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Start shopping to see your orders here',
             style: TextStyle(color: AppColors.foregroundMuted),
           ),
@@ -151,11 +151,12 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       elevation: 0,
       child: InkWell(
@@ -191,7 +192,7 @@ class _OrderCard extends StatelessWidget {
               // Order date
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.calendar_today_outlined,
                     size: 16,
                     color: AppColors.foregroundMuted,
@@ -199,7 +200,7 @@ class _OrderCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     DateFormat('MMM dd, yyyy').format(order.createdAt),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.foregroundMuted,
                       fontSize: 14,
                     ),
@@ -227,7 +228,7 @@ class _OrderCard extends StatelessWidget {
                         child: Center(
                           child: Text(
                             '+${order.items.length - 3}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: AppColors.foregroundMuted,
                             ),
@@ -250,7 +251,7 @@ class _OrderCard extends StatelessWidget {
                         child: Image.network(
                           item.product.imageUrl,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const Icon(
+                          errorBuilder: (_, _, _) => Icon(
                             Icons.image_not_supported_outlined,
                             color: AppColors.foregroundMuted,
                           ),
@@ -263,7 +264,7 @@ class _OrderCard extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Divider
-              const Divider(color: AppColors.border),
+              Divider(color: AppColors.border),
               const SizedBox(height: 8),
 
               // Footer
@@ -275,7 +276,7 @@ class _OrderCard extends StatelessWidget {
                     children: [
                       Text(
                         '${order.itemCount} item${order.itemCount > 1 ? 's' : ''}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.foregroundMuted,
                           fontSize: 14,
                         ),
@@ -304,7 +305,7 @@ class _OrderCard extends StatelessWidget {
                           },
                           child: const Text('Track Order'),
                         ),
-                      const Icon(
+                      Icon(
                         Icons.chevron_right,
                         color: AppColors.foregroundMuted,
                       ),

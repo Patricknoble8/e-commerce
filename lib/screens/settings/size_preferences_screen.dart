@@ -137,6 +137,7 @@ class SizePreferencesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppColors.bind(context);
     final prefs = ref.watch(sizePreferencesProvider);
     final notifier = ref.read(sizePreferencesProvider.notifier);
 
@@ -338,7 +339,9 @@ class SizePreferencesScreen extends ConsumerWidget {
                   'US / UK',
                   textAlign: TextAlign.center,
                   style: AppTypography.labelMedium.copyWith(
-                    color: !useMetric ? Colors.white : AppColors.foreground,
+                    color: !useMetric
+                        ? AppColors.primaryForeground
+                        : AppColors.foreground,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -363,7 +366,9 @@ class SizePreferencesScreen extends ConsumerWidget {
                   'EU / Metric',
                   textAlign: TextAlign.center,
                   style: AppTypography.labelMedium.copyWith(
-                    color: useMetric ? Colors.white : AppColors.foreground,
+                    color: useMetric
+                        ? AppColors.primaryForeground
+                        : AppColors.foreground,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -406,7 +411,9 @@ class SizePreferencesScreen extends ConsumerWidget {
               size,
               textAlign: TextAlign.center,
               style: AppTypography.labelMedium.copyWith(
-                color: isSelected ? Colors.white : AppColors.foreground,
+                color: isSelected
+                    ? AppColors.primaryForeground
+                    : AppColors.foreground,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),

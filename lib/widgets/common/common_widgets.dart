@@ -18,6 +18,7 @@ class Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingSm,
@@ -54,6 +55,7 @@ class ChipComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Material(
       color: isSelected ? AppColors.primary : AppColors.background,
       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -116,6 +118,7 @@ class ColorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -152,6 +155,7 @@ class SizeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Material(
       color: isSelected ? AppColors.primary : AppColors.background,
       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -193,6 +197,7 @@ class DividerComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       height: height ?? AppBorderWidth.thin,
       color: AppColors.border,

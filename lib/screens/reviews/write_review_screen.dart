@@ -170,6 +170,7 @@ class _WriteReviewScreenState extends ConsumerState<WriteReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -315,6 +316,8 @@ class _WriteReviewScreenState extends ConsumerState<WriteReviewScreen> {
         SizedBox(height: AppSpacing.sm),
         TextFormField(
           controller: _titleController,
+          cursorColor: AppColors.primary,
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText: 'Summarize your experience',
             border: OutlineInputBorder(
@@ -344,6 +347,8 @@ class _WriteReviewScreenState extends ConsumerState<WriteReviewScreen> {
         SizedBox(height: AppSpacing.sm),
         TextFormField(
           controller: _commentController,
+          cursorColor: AppColors.primary,
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
           decoration: InputDecoration(
             hintText:
                 'What did you like or dislike? What did you use this product for?',

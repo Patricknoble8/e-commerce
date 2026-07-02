@@ -125,6 +125,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppColors.bind(context);
     final prefs = ref.watch(notificationPreferencesProvider);
     final notifier = ref.read(notificationPreferencesProvider.notifier);
 
@@ -140,7 +141,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: AppColors.foreground),
+            icon: Icon(Icons.more_vert, color: AppColors.foreground),
             onSelected: (value) {
               if (value == 'enable_all') {
                 notifier.enableAll();

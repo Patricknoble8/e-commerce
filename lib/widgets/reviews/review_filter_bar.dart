@@ -19,6 +19,7 @@ class ReviewFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

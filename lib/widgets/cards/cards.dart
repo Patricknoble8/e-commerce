@@ -21,6 +21,7 @@ class CardComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Material(
       color: AppColors.background,
       borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -72,6 +73,7 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return CardComponent(
       onTap: onTap,
       padding: EdgeInsets.all(AppSpacing.paddingSm),

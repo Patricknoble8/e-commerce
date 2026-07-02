@@ -22,6 +22,7 @@ class ReviewSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -89,6 +90,7 @@ class CompactRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

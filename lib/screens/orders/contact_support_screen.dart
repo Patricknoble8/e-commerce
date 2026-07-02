@@ -62,6 +62,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -327,6 +328,8 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
         SizedBox(height: AppSpacing.sm),
         TextFormField(
           controller: controller,
+          cursorColor: AppColors.primary,
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
           maxLines: maxLines,
           validator: validator,
           decoration: InputDecoration(
@@ -338,15 +341,15 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
             fillColor: AppColors.card,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -375,6 +378,7 @@ class _QuickContactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),

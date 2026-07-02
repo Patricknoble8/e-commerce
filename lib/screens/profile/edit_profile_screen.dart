@@ -94,6 +94,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -233,6 +234,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         SizedBox(height: AppSpacing.sm),
         TextFormField(
           controller: controller,
+          cursorColor: AppColors.primary,
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
           keyboardType: keyboardType,
           validator: validator,
           inputFormatters: keyboardType == TextInputType.phone
@@ -248,15 +251,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             fillColor: AppColors.card,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),

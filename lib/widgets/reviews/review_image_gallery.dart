@@ -44,6 +44,7 @@ class _ReviewImageGalleryState extends State<ReviewImageGallery> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
@@ -297,6 +298,7 @@ class _ZoomableImageState extends State<ZoomableImage>
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final imageWidget = InteractiveViewer(
       transformationController: _controller,
       minScale: 0.5,

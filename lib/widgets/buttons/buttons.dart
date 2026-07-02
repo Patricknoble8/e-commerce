@@ -23,6 +23,7 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return SizedBox(
       width: fullWidth ? double.infinity : null,
       height: 44,
@@ -49,7 +50,7 @@ class PrimaryButton extends StatelessWidget {
               ),
             ),
         child: isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
@@ -97,6 +98,7 @@ class SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return SizedBox(
       width: fullWidth ? double.infinity : null,
       height: 44,
@@ -105,7 +107,7 @@ class SecondaryButton extends StatelessWidget {
         style:
             OutlinedButton.styleFrom(
               foregroundColor: AppColors.foreground,
-              side: const BorderSide(
+              side: BorderSide(
                 color: AppColors.border,
                 width: AppBorderWidth.thin,
               ),
@@ -152,6 +154,7 @@ class GhostButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return TextButton(
       onPressed: onPressed,
       style:
@@ -199,6 +202,7 @@ class IconButtonComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     return Material(
       color: backgroundColor ?? Colors.transparent,
       borderRadius: BorderRadius.circular(AppRadius.md),

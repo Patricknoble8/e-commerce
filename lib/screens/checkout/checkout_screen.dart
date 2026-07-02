@@ -38,6 +38,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final cartState = ref.watch(cartProvider);
     final isMobile = MediaQuery.of(context).size.width < 1000;
 
@@ -183,11 +184,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           ),
           child: Center(
             child: isCompleted
-                ? const Icon(Icons.check, color: Colors.white, size: 20)
+                ? Icon(
+                    Icons.check,
+                    color: AppColors.primaryForeground,
+                    size: 20,
+                  )
                 : Text(
                     '${step + 1}',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: Colors.white,
+                      color: isActive
+                          ? AppColors.primaryForeground
+                          : AppColors.foregroundSecondary,
                       fontWeight: AppTypography.semiBold,
                     ),
                   ),
@@ -234,10 +241,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Icon(
                           Icons.location_on,
-                          color: Colors.white,
+                          color: AppColors.primaryForeground,
                           size: 16,
                         ),
                       ),
@@ -464,10 +471,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     Icons.local_shipping_outlined,
-                    color: Colors.white,
+                    color: AppColors.primaryForeground,
                     size: 16,
                   ),
                 ),
@@ -582,7 +589,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   child: Icon(
                     icon,
                     color: isSelected
-                        ? Colors.white
+                        ? AppColors.primaryForeground
                         : AppColors.foregroundSecondary,
                   ),
                 ),
@@ -683,10 +690,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     Icons.credit_card_outlined,
-                    color: Colors.white,
+                    color: AppColors.primaryForeground,
                     size: 16,
                   ),
                 ),
@@ -933,7 +940,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.border),
         borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        color: AppColors.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1103,6 +1110,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         SizedBox(height: AppSpacing.xs),
         TextFormField(
           controller: controller,
+          cursorColor: AppColors.primary,
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.foreground),
           keyboardType: keyboardType,
           autofillHints: autofillHints,
           textInputAction: textInputAction,
@@ -1115,15 +1124,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             contentPadding: EdgeInsets.all(AppSpacing.md),
           ),

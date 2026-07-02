@@ -83,6 +83,7 @@ class _ReviewCardState extends State<ReviewCard>
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final hasMarkedHelpful =
         widget.currentUserId != null &&
         widget.review.hasUserMarkedHelpful(widget.currentUserId!);
@@ -398,6 +399,7 @@ class ReviewImageThumbnails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final displayCount = images.length > maxDisplay
         ? maxDisplay
         : images.length;

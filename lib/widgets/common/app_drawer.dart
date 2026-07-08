@@ -2,23 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/navigation/app_routes.dart';
+import '../../config/theme/colors.dart';
 import '../../providers/providers.dart';
 
 /// Professional app drawer with shadcn/ui styling
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
-  // shadcn/ui inspired color palette
-  static const Color _foreground = Color(0xFF0A0A0A);
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _mutedForeground = Color(0xFF71717A);
-  static const Color _border = Color(0xFFE4E4E7);
-  static const Color _primary = Color(0xFF18181B);
-  static const Color _destructive = Color(0xFFEF4444);
+  Color get _foreground => AppColors.foreground;
+  Color get _card => AppColors.card;
+  Color get _muted => AppColors.muted;
+  Color get _mutedForeground => AppColors.mutedForeground;
+  Color get _border => AppColors.border;
+  Color get _primary => AppColors.primary;
+  Color get _primaryForeground => AppColors.primaryForeground;
+  Color get _destructive => AppColors.destructive;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppColors.bind(context);
     final profile = ref.watch(userProvider);
     final cartItemCount = ref.watch(cartProvider).itemCount;
     final favorites = ref.watch(favoritesProvider);
@@ -171,8 +173,8 @@ class AppDrawer extends ConsumerWidget {
             child: Center(
               child: Text(
                 _getInitials(profile.name),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: _primaryForeground,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
@@ -326,7 +328,7 @@ class AppDrawer extends ConsumerWidget {
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: _foreground,
-                  letterSpacing: -0.5,
+                  letterSpacing: 0,
                 ),
               ),
             ],
@@ -416,7 +418,10 @@ class AppDrawer extends ConsumerWidget {
               navigator.pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
               messenger.showSnackBar(
                 SnackBar(
-                  content: const Text('Signed out successfully'),
+                  content: Text(
+                    'Signed out successfully',
+                    style: TextStyle(color: _primaryForeground),
+                  ),
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: _primary,
                   shape: RoundedRectangleBorder(

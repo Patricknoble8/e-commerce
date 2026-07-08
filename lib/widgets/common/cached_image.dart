@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../config/theme/colors.dart';
 import 'shimmer_loading.dart';
 
 /// Optimized network image widget with loading states
@@ -23,11 +24,13 @@ class OptimizedNetworkImage extends StatelessWidget {
     this.errorWidget,
   });
 
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _mutedForeground = Color(0xFF71717A);
+  Color get _muted => AppColors.muted;
+  Color get _mutedForeground => AppColors.mutedForeground;
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
+
     Widget imageWidget = Image.network(
       imageUrl,
       fit: fit,
@@ -43,10 +46,10 @@ class OptimizedNetworkImage extends StatelessWidget {
             child: child,
           );
         }
-        return placeholder ?? _buildPlaceholder();
+        return placeholder ?? _buildPlaceholder(context);
       },
       errorBuilder: (context, error, stackTrace) =>
-          errorWidget ?? _buildErrorWidget(),
+          errorWidget ?? _buildErrorWidget(context),
     );
 
     if (borderRadius != null) {
@@ -56,7 +59,9 @@ class OptimizedNetworkImage extends StatelessWidget {
     return imageWidget;
   }
 
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder(BuildContext context) {
+    AppColors.bind(context);
+
     return Container(
       width: width,
       height: height,
@@ -69,7 +74,9 @@ class OptimizedNetworkImage extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorWidget() {
+  Widget _buildErrorWidget(BuildContext context) {
+    AppColors.bind(context);
+
     return Container(
       width: width,
       height: height,

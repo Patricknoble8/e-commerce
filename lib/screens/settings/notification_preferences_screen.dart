@@ -332,7 +332,7 @@ class NotificationPreferencesScreen extends ConsumerWidget {
         title.toUpperCase(),
         style: AppTypography.labelSmall.copyWith(
           color: AppColors.foregroundSecondary,
-          letterSpacing: 1.2,
+          letterSpacing: 0,
           fontWeight: FontWeight.w600,
         ),
       ),

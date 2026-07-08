@@ -1,15 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'colors.dart';
 import 'typography.dart';
 
 /// Main app theme configuration following shadcn/ui design principles
 class AppTheme {
+  static SystemUiOverlayStyle systemOverlayStyle(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: isDark
+          ? AppColorsDark.background
+          : AppColorsLight.background,
+      systemNavigationBarDividerColor: isDark
+          ? AppColorsDark.border
+          : AppColorsLight.border,
+      systemNavigationBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark,
+      systemNavigationBarContrastEnforced: false,
+      systemStatusBarContrastEnforced: false,
+    );
+  }
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: AppTypography.fontFamily,
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColorsLight.background,
+      canvasColor: AppColorsLight.background,
 
       // Color scheme
       colorScheme: const ColorScheme.light(
@@ -29,22 +52,27 @@ class AppTheme {
       ),
 
       // App bar theme
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColorsLight.background,
         foregroundColor: AppColorsLight.foreground,
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
-        titleTextStyle: TextStyle(
+        systemOverlayStyle: systemOverlayStyle(Brightness.light),
+        titleTextStyle: const TextStyle(
           color: AppColorsLight.foreground,
           fontSize: 18,
           fontWeight: AppTypography.semiBold,
         ),
       ),
 
+      iconTheme: const IconThemeData(color: AppColorsLight.foreground),
+
       // Card theme
       cardTheme: const CardThemeData(
         color: AppColorsLight.background,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -133,6 +161,67 @@ class AppTheme {
         ),
       ),
 
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: AppColorsLight.foreground,
+          disabledForegroundColor: AppColorsLight.mutedForeground,
+        ),
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColorsLight.primaryForeground;
+          }
+          return AppColorsLight.background;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColorsLight.primary;
+          }
+          return AppColorsLight.muted;
+        }),
+        trackOutlineColor: WidgetStateProperty.all(AppColorsLight.border),
+      ),
+
+      listTileTheme: const ListTileThemeData(
+        iconColor: AppColorsLight.foregroundSecondary,
+        textColor: AppColorsLight.foreground,
+        titleTextStyle: TextStyle(
+          color: AppColorsLight.foreground,
+          fontSize: 15,
+          fontWeight: AppTypography.medium,
+        ),
+        subtitleTextStyle: TextStyle(
+          color: AppColorsLight.foregroundSecondary,
+          fontSize: 12,
+        ),
+      ),
+
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColorsLight.background,
+        selectedItemColor: AppColorsLight.foreground,
+        unselectedItemColor: AppColorsLight.foregroundSecondary,
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+      ),
+
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColorsLight.background,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: AppColorsLight.muted,
+        labelTextStyle: WidgetStateProperty.all(
+          const TextStyle(fontSize: 12, fontWeight: AppTypography.medium),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          return IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? AppColorsLight.foreground
+                : AppColorsLight.foregroundSecondary,
+          );
+        }),
+      ),
+
       // Divider theme
       dividerTheme: const DividerThemeData(
         color: AppColorsLight.border,
@@ -146,6 +235,27 @@ class AppTheme {
         side: BorderSide.none,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
+
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColorsLight.primary,
+        contentTextStyle: const TextStyle(
+          color: AppColorsLight.primaryForeground,
+          fontWeight: AppTypography.medium,
+        ),
+        actionTextColor: AppColorsLight.primaryForeground,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColorsLight.card,
+        surfaceTintColor: Colors.transparent,
+      ),
+
+      dialogTheme: const DialogThemeData(
+        backgroundColor: AppColorsLight.card,
+        surfaceTintColor: Colors.transparent,
+      ),
     );
   }
 
@@ -156,6 +266,7 @@ class AppTheme {
       fontFamily: AppTypography.fontFamily,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColorsDark.background,
+      canvasColor: AppColorsDark.background,
 
       // Color scheme
       colorScheme: const ColorScheme.dark(
@@ -175,22 +286,27 @@ class AppTheme {
       ),
 
       // App bar theme
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColorsDark.background,
         foregroundColor: AppColorsDark.foreground,
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
-        titleTextStyle: TextStyle(
+        systemOverlayStyle: systemOverlayStyle(Brightness.dark),
+        titleTextStyle: const TextStyle(
           color: AppColorsDark.foreground,
           fontSize: 18,
           fontWeight: AppTypography.semiBold,
         ),
       ),
 
+      iconTheme: const IconThemeData(color: AppColorsDark.foreground),
+
       // Card theme
       cardTheme: const CardThemeData(
         color: AppColorsDark.card,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -279,6 +395,67 @@ class AppTheme {
         ),
       ),
 
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: AppColorsDark.foreground,
+          disabledForegroundColor: AppColorsDark.mutedForeground,
+        ),
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColorsDark.primaryForeground;
+          }
+          return AppColorsDark.background;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColorsDark.primary;
+          }
+          return AppColorsDark.muted;
+        }),
+        trackOutlineColor: WidgetStateProperty.all(AppColorsDark.border),
+      ),
+
+      listTileTheme: const ListTileThemeData(
+        iconColor: AppColorsDark.foregroundSecondary,
+        textColor: AppColorsDark.foreground,
+        titleTextStyle: TextStyle(
+          color: AppColorsDark.foreground,
+          fontSize: 15,
+          fontWeight: AppTypography.medium,
+        ),
+        subtitleTextStyle: TextStyle(
+          color: AppColorsDark.foregroundSecondary,
+          fontSize: 12,
+        ),
+      ),
+
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColorsDark.background,
+        selectedItemColor: AppColorsDark.foreground,
+        unselectedItemColor: AppColorsDark.foregroundSecondary,
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+      ),
+
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColorsDark.background,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: AppColorsDark.muted,
+        labelTextStyle: WidgetStateProperty.all(
+          const TextStyle(fontSize: 12, fontWeight: AppTypography.medium),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          return IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? AppColorsDark.foreground
+                : AppColorsDark.foregroundSecondary,
+          );
+        }),
+      ),
+
       // Divider theme
       dividerTheme: const DividerThemeData(
         color: AppColorsDark.border,
@@ -303,6 +480,17 @@ class AppTheme {
       dialogTheme: const DialogThemeData(
         backgroundColor: AppColorsDark.card,
         surfaceTintColor: Colors.transparent,
+      ),
+
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColorsDark.primary,
+        contentTextStyle: const TextStyle(
+          color: AppColorsDark.primaryForeground,
+          fontWeight: AppTypography.medium,
+        ),
+        actionTextColor: AppColorsDark.primaryForeground,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

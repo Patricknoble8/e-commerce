@@ -17,7 +17,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = ref.watch(themeProvider);
+    final selectedThemeMode = ref.watch(themeProvider);
+    final effectiveBrightness = ref.watch(effectiveBrightnessProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -39,55 +40,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           const SizedBox(height: 8),
           Card(
+            clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
-                _buildThemeOption(
-                  context,
-                  ref,
-                  title: 'Light',
-                  subtitle: 'Always use light mode',
-                  icon: Icons.light_mode,
-                  isSelected: themeMode == AppThemeMode.light,
-                  onTap: () {
-                    ref
-                        .read(themeProvider.notifier)
-                        .setThemeMode(AppThemeMode.light);
-                  },
-                ),
-                Divider(
-                  height: 1,
-                  color: colorScheme.outline.withValues(alpha: 0.2),
-                ),
-                _buildThemeOption(
-                  context,
-                  ref,
-                  title: 'Dark',
-                  subtitle: 'Always use dark mode',
-                  icon: Icons.dark_mode,
-                  isSelected: themeMode == AppThemeMode.dark,
-                  onTap: () {
-                    ref
-                        .read(themeProvider.notifier)
-                        .setThemeMode(AppThemeMode.dark);
-                  },
-                ),
-                Divider(
-                  height: 1,
-                  color: colorScheme.outline.withValues(alpha: 0.2),
-                ),
-                _buildThemeOption(
-                  context,
-                  ref,
-                  title: 'System',
-                  subtitle: 'Follow system settings',
-                  icon: Icons.settings_suggest,
-                  isSelected: themeMode == AppThemeMode.system,
-                  onTap: () {
-                    ref
-                        .read(themeProvider.notifier)
-                        .setThemeMode(AppThemeMode.system);
-                  },
-                ),
+                for (final mode in AppThemeMode.values) ...[
+                  _buildThemeOption(
+                    context,
+                    mode: mode,
+                    effectiveBrightness: effectiveBrightness,
+                    isSelected: selectedThemeMode == mode,
+                    onTap: () {
+                      ref.read(themeProvider.notifier).setThemeMode(mode);
+                    },
+                  ),
+                  if (mode != AppThemeMode.values.last)
+                    Divider(
+                      height: 1,
+                      color: colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                ],
               ],
             ),
           ),
@@ -196,44 +167,61 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildThemeOption(
-    BuildContext context,
-    WidgetRef ref, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
+    BuildContext context, {
+    required AppThemeMode mode,
+    required Brightness effectiveBrightness,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final activeSystemMode = effectiveBrightness == Brightness.dark
+        ? 'Dark active'
+        : 'Light active';
 
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary.withValues(alpha: 0.1)
-              : colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(8),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      color: isSelected
+          ? colorScheme.primary.withValues(alpha: 0.04)
+          : Colors.transparent,
+      child: ListTile(
+        selected: isSelected,
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? colorScheme.primary.withValues(alpha: 0.12)
+                : colorScheme.onSurface.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            mode.icon,
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
-        child: Icon(
-          icon,
-          color: isSelected
-              ? colorScheme.primary
-              : colorScheme.onSurface.withValues(alpha: 0.6),
+        title: Text(mode.title),
+        subtitle: Text(
+          mode == AppThemeMode.system
+              ? '${mode.subtitle} • $activeSystemMode'
+              : mode.subtitle,
+          style: TextStyle(
+            fontSize: 12,
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
+        trailing: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 160),
+          child: isSelected
+              ? Icon(
+                  Icons.check_circle,
+                  key: ValueKey(mode),
+                  color: colorScheme.primary,
+                )
+              : const SizedBox.shrink(),
+        ),
+        onTap: onTap,
       ),
-      title: Text(title),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          fontSize: 12,
-          color: colorScheme.onSurface.withValues(alpha: 0.6),
-        ),
-      ),
-      trailing: isSelected
-          ? Icon(Icons.check_circle, color: colorScheme.primary)
-          : null,
-      onTap: onTap,
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../config/navigation/app_routes.dart';
+import '../../config/theme/colors.dart';
 import '../../providers/providers.dart';
 import '../../models/category.dart';
 import '../../models/product.dart';
@@ -34,15 +35,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   int _selectedNavIndex = 0;
   late AnimationController _fadeController;
 
-  // shadcn/ui inspired color palette
-  static const Color _background = Color(0xFFFAFAFA);
-  static const Color _foreground = Color(0xFF0A0A0A);
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _mutedForeground = Color(0xFF71717A);
-  static const Color _border = Color(0xFFE4E4E7);
-  static const Color _primary = Color(0xFF18181B);
-  static const Color _destructive = Color(0xFFEF4444);
+  Color get _background => AppColors.background;
+  Color get _foreground => AppColors.foreground;
+  Color get _card => AppColors.card;
+  Color get _muted => AppColors.muted;
+  Color get _mutedForeground => AppColors.mutedForeground;
+  Color get _border => AppColors.border;
+  Color get _primary => AppColors.primary;
+  Color get _primaryForeground => AppColors.primaryForeground;
+  Color get _destructive => AppColors.destructive;
 
   @override
   void initState() {
@@ -80,6 +81,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
     final unreadCount = ref.watch(unreadCountProvider);
 
     return Scaffold(
@@ -96,10 +98,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Row(
-                    children: const [
-                      Icon(Icons.check_circle, color: Colors.white, size: 20),
-                      SizedBox(width: 12),
-                      Text('Products refreshed!'),
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: _primaryForeground,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Products refreshed!',
+                        style: TextStyle(color: _primaryForeground),
+                      ),
                     ],
                   ),
                   behavior: SnackBarBehavior.floating,
@@ -323,7 +332,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               fontSize: 24,
               fontWeight: FontWeight.w700,
               color: _foreground,
-              letterSpacing: -0.5,
+              letterSpacing: 0,
             ),
           ),
         ],
@@ -471,7 +480,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                   child: Icon(
                     Icons.tune_rounded,
-                    color: Colors.white,
+                    color: _primaryForeground,
                     size: 18,
                   ),
                 ),
@@ -582,7 +591,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     fontSize: 9,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
-                                    letterSpacing: 1.2,
+                                    letterSpacing: 0,
                                   ),
                                 ),
                               ),
@@ -593,7 +602,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   fontSize: 28,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.white,
-                                  letterSpacing: -1,
+                                  letterSpacing: 0,
                                   height: 1.1,
                                 ),
                               ),
@@ -698,7 +707,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: _foreground,
-                  letterSpacing: -0.5,
+                  letterSpacing: 0,
                 ),
               ),
               GestureDetector(
@@ -819,7 +828,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: _foreground,
-              letterSpacing: -0.5,
+              letterSpacing: 0,
             ),
           ),
           const SizedBox(height: 16),
@@ -1060,7 +1069,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
                           color: _mutedForeground,
-                          letterSpacing: 0.5,
+                          letterSpacing: 0,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -1135,14 +1144,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Row(
-                                      children: const [
+                                      children: [
                                         Icon(
                                           Icons.check_circle,
-                                          color: Colors.white,
+                                          color: _primaryForeground,
                                           size: 20,
                                         ),
-                                        SizedBox(width: 12),
-                                        Text('Added to cart'),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Added to cart',
+                                          style: TextStyle(
+                                            color: _primaryForeground,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     behavior: SnackBarBehavior.floating,
@@ -1154,7 +1168,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     margin: const EdgeInsets.all(16),
                                     action: SnackBarAction(
                                       label: 'View',
-                                      textColor: Colors.white,
+                                      textColor: _primaryForeground,
                                       onPressed: () {
                                         Navigator.pushNamed(context, '/cart');
                                       },
@@ -1168,9 +1182,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   color: _primary,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.add_shopping_cart_rounded,
-                                  color: Colors.white,
+                                  color: _primaryForeground,
                                   size: 18,
                                 ),
                               ),

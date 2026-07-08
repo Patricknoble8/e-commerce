@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../config/theme/colors.dart';
 import '../../data/category_data.dart';
 import '../../models/category.dart';
 import '../../widgets/common/app_back_button.dart';
@@ -17,14 +18,14 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  // shadcn/ui inspired color palette
-  static const Color _background = Color(0xFFFAFAFA);
-  static const Color _foreground = Color(0xFF0A0A0A);
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _mutedForeground = Color(0xFF71717A);
-  static const Color _border = Color(0xFFE4E4E7);
-  static const Color _primary = Color(0xFF18181B);
+  Color get _background => AppColors.background;
+  Color get _foreground => AppColors.foreground;
+  Color get _card => AppColors.card;
+  Color get _muted => AppColors.muted;
+  Color get _mutedForeground => AppColors.mutedForeground;
+  Color get _border => AppColors.border;
+  Color get _primary => AppColors.primary;
+  Color get _primaryForeground => AppColors.primaryForeground;
 
   Category? _selectedMainCategory;
   Category? _selectedSubCategory;
@@ -39,6 +40,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
+
     return Scaffold(
       backgroundColor: _background,
       appBar: _buildAppBar(),
@@ -68,10 +71,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               foregroundColor: _foreground,
               backgroundColor: _card,
             )
-          : const AppBackButton(
-              foregroundColor: _foreground,
-              backgroundColor: _card,
-            ),
+          : AppBackButton(foregroundColor: _foreground, backgroundColor: _card),
       title: Text(
         _selectedSubCategory?.name ??
             _selectedMainCategory?.name ??
@@ -80,7 +80,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: _foreground,
-          letterSpacing: -0.5,
+          letterSpacing: 0,
         ),
       ),
       centerTitle: true,
@@ -158,7 +158,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: _foreground,
-                          letterSpacing: -0.3,
+                          letterSpacing: 0,
                         ),
                       ),
                       if (category.hasSubcategories) ...[
@@ -377,12 +377,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   color: _primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
+                child: Text(
                   'Browse All Products',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white,
+                    color: _primaryForeground,
                   ),
                 ),
               ),
@@ -418,13 +418,16 @@ class CategoryChip extends StatelessWidget {
     this.onTap,
   });
 
-  static const Color _foreground = Color(0xFF0A0A0A);
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _border = Color(0xFFE4E4E7);
-  static const Color _primary = Color(0xFF18181B);
+  Color get _foreground => AppColors.foreground;
+  Color get _card => AppColors.card;
+  Color get _border => AppColors.border;
+  Color get _primary => AppColors.primary;
+  Color get _primaryForeground => AppColors.primaryForeground;
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -456,7 +459,7 @@ class CategoryChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : _foreground,
+                color: isSelected ? _primaryForeground : _foreground,
               ),
             ),
           ],
@@ -473,13 +476,15 @@ class CategoryGridItem extends StatelessWidget {
 
   const CategoryGridItem({super.key, required this.category, this.onTap});
 
-  static const Color _foreground = Color(0xFF0A0A0A);
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _border = Color(0xFFE4E4E7);
+  Color get _foreground => AppColors.foreground;
+  Color get _card => AppColors.card;
+  Color get _muted => AppColors.muted;
+  Color get _border => AppColors.border;
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();

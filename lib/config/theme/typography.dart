@@ -17,21 +17,21 @@ class AppTypography {
     fontSize: 32,
     fontWeight: bold,
     height: 1.2,
-    letterSpacing: -0.5,
+    letterSpacing: 0,
   );
 
   static const TextStyle h2 = TextStyle(
     fontSize: 24,
     fontWeight: semiBold,
     height: 1.3,
-    letterSpacing: -0.3,
+    letterSpacing: 0,
   );
 
   static const TextStyle h3 = TextStyle(
     fontSize: 20,
     fontWeight: semiBold,
     height: 1.4,
-    letterSpacing: -0.2,
+    letterSpacing: 0,
   );
 
   static const TextStyle h4 = TextStyle(

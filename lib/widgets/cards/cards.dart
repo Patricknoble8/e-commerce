@@ -191,7 +191,7 @@ class ProductCard extends StatelessWidget {
               brand!.toUpperCase(),
               style: AppTypography.labelSmall.copyWith(
                 color: AppColors.mutedForeground,
-                letterSpacing: 0.5,
+                letterSpacing: 0,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

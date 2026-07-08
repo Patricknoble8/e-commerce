@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/theme/colors.dart';
 import '../../providers/notifiers/product_notifier.dart';
 import '../../models/product.dart';
 import '../../widgets/common/cached_image.dart';
@@ -27,15 +28,14 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
   Timer? _searchDebounce;
   bool _isLoading = false;
 
-  // Colors
-  static const Color _background = Color(0xFFFAFAFA);
-  static const Color _foreground = Color(0xFF0A0A0A);
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _mutedForeground = Color(0xFF71717A);
-  static const Color _border = Color(0xFFE4E4E7);
-  static const Color _primary = Color(0xFF18181B);
-  static const Color _destructive = Color(0xFFEF4444);
+  Color get _background => AppColors.background;
+  Color get _foreground => AppColors.foreground;
+  Color get _card => AppColors.card;
+  Color get _muted => AppColors.muted;
+  Color get _mutedForeground => AppColors.mutedForeground;
+  Color get _border => AppColors.border;
+  Color get _primary => AppColors.primary;
+  Color get _destructive => AppColors.destructive;
 
   @override
   void initState() {
@@ -85,6 +85,8 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
+
     final products = ref.watch(filteredProductsProvider);
     final searchQuery = ref.watch(searchQueryProvider);
     final favorites = ref.watch(favoritesProvider);
@@ -316,7 +318,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: _mutedForeground,
-                        letterSpacing: 0.5,
+                        letterSpacing: 0,
                       ),
                     ),
                     const SizedBox(height: 4),

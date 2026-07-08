@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../config/theme/colors.dart';
 import '../../providers/notifiers/product_notifier.dart';
 import '../../models/product.dart';
 
@@ -13,13 +14,13 @@ class FilterBottomSheet extends ConsumerStatefulWidget {
 }
 
 class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
-  // Colors
-  static const Color _foreground = Color(0xFF0A0A0A);
-  static const Color _card = Color(0xFFFFFFFF);
-  static const Color _muted = Color(0xFFF4F4F5);
-  static const Color _mutedForeground = Color(0xFF71717A);
-  static const Color _border = Color(0xFFE4E4E7);
-  static const Color _primary = Color(0xFF18181B);
+  Color get _foreground => AppColors.foreground;
+  Color get _card => AppColors.card;
+  Color get _muted => AppColors.muted;
+  Color get _mutedForeground => AppColors.mutedForeground;
+  Color get _border => AppColors.border;
+  Color get _primary => AppColors.primary;
+  Color get _primaryForeground => AppColors.primaryForeground;
 
   // Local state for filters
   ProductCategory? _selectedCategory;
@@ -53,6 +54,8 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
+
     return Container(
       decoration: BoxDecoration(
         color: _card,
@@ -199,7 +202,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : _foreground,
+                color: isSelected ? _primaryForeground : _foreground,
               ),
             ),
           ),
@@ -345,7 +348,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
             onPressed: _applyFilters,
             style: ElevatedButton.styleFrom(
               backgroundColor: _primary,
-              foregroundColor: Colors.white,
+              foregroundColor: _primaryForeground,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

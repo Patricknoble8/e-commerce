@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../config/theme/colors.dart';
 import '../../models/category.dart';
 import '../../models/product.dart';
 import '../../data/category_data.dart';
@@ -9,19 +10,18 @@ import '../../providers/providers.dart';
 import '../../widgets/common/app_back_button.dart';
 import '../product_detail/product_detail_screen.dart';
 
-// Shadcn color palette
-const _background = Color(0xFFFAFAFA);
-const _foreground = Color(0xFF0A0A0A);
-const _card = Color(0xFFFFFFFF);
-const _cardForeground = Color(0xFF0A0A0A);
-const _primary = Color(0xFF18181B);
-const _primaryForeground = Color(0xFFFAFAFA);
-const _secondary = Color(0xFFF4F4F5);
-const _secondaryForeground = Color(0xFF18181B);
-const _muted = Color(0xFFF4F4F5);
-const _mutedForeground = Color(0xFF71717A);
-const _border = Color(0xFFE4E4E7);
-const _destructive = Color(0xFFEF4444);
+Color get _background => AppColors.background;
+Color get _foreground => AppColors.foreground;
+Color get _card => AppColors.card;
+Color get _cardForeground => AppColors.cardForeground;
+Color get _primary => AppColors.primary;
+Color get _primaryForeground => AppColors.primaryForeground;
+Color get _secondary => AppColors.secondary;
+Color get _secondaryForeground => AppColors.secondaryForeground;
+Color get _muted => AppColors.muted;
+Color get _mutedForeground => AppColors.mutedForeground;
+Color get _border => AppColors.border;
+Color get _destructive => AppColors.destructive;
 
 enum SortOption { featured, priceLowToHigh, priceHighToLow, topRated }
 
@@ -44,6 +44,8 @@ class _CategoryProductsScreenState
 
   @override
   Widget build(BuildContext context) {
+    AppColors.bind(context);
+
     final allProducts = ref.watch(productListProvider);
     final filteredProducts = _getFilteredProducts(allProducts);
 
@@ -58,7 +60,7 @@ class _CategoryProductsScreenState
             pinned: true,
             backgroundColor: _card,
             surfaceTintColor: Colors.transparent,
-            leading: const AppBackButton(
+            leading: AppBackButton(
               foregroundColor: _foreground,
               backgroundColor: _card,
             ),
@@ -106,7 +108,7 @@ class _CategoryProductsScreenState
                       Expanded(
                         child: Text(
                           widget.category.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: _foreground,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -120,7 +122,7 @@ class _CategoryProductsScreenState
                   const SizedBox(height: 2),
                   Text(
                     '${filteredProducts.length} products',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: _mutedForeground,
                       fontSize: 12,
                       fontWeight: FontWeight.normal,
@@ -470,7 +472,7 @@ class _CategoryProductsScreenState
   Widget _buildSubcategoryChips() {
     return Container(
       height: 50,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: _card,
         border: Border(bottom: BorderSide(color: _border, width: 1)),
       ),
@@ -521,14 +523,14 @@ class _CategoryProductsScreenState
   Widget _buildFilterPanel() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: _card,
         border: Border(bottom: BorderSide(color: _border, width: 1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Price Range',
             style: TextStyle(
               color: _foreground,
@@ -541,7 +543,7 @@ class _CategoryProductsScreenState
             children: [
               Text(
                 '\$${_priceRange.start.round()}',
-                style: const TextStyle(color: _mutedForeground, fontSize: 13),
+                style: TextStyle(color: _mutedForeground, fontSize: 13),
               ),
               Expanded(
                 child: RangeSlider(
@@ -558,7 +560,7 @@ class _CategoryProductsScreenState
               ),
               Text(
                 '\$${_priceRange.end.round()}',
-                style: const TextStyle(color: _mutedForeground, fontSize: 13),
+                style: TextStyle(color: _mutedForeground, fontSize: 13),
               ),
             ],
           ),
@@ -574,7 +576,7 @@ class _CategoryProductsScreenState
                     _selectedSort = SortOption.featured;
                   });
                 },
-                child: const Text(
+                child: Text(
                   'Reset Filters',
                   style: TextStyle(
                     color: _destructive,
@@ -611,7 +613,7 @@ class _CategoryProductsScreenState
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Sort By',
               style: TextStyle(
                 color: _foreground,
@@ -664,7 +666,7 @@ class _CategoryProductsScreenState
         ),
       ),
       trailing: isSelected
-          ? const Icon(Icons.check_rounded, color: _primary, size: 22)
+          ? Icon(Icons.check_rounded, color: _primary, size: 22)
           : null,
       onTap: () {
         HapticFeedback.selectionClick();
@@ -686,14 +688,14 @@ class _CategoryProductsScreenState
               color: _muted,
               borderRadius: BorderRadius.circular(50),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.search_off_rounded,
               size: 48,
               color: _mutedForeground,
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'No products found',
             style: TextStyle(
               color: _foreground,
@@ -832,7 +834,7 @@ class _CategoryProductsScreenState
                           width: 36,
                           height: 36,
                           alignment: Alignment.center,
-                          child: const Icon(
+                          child: Icon(
                             Icons.add_rounded,
                             color: _primaryForeground,
                             size: 20,
@@ -856,11 +858,11 @@ class _CategoryProductsScreenState
                     if (product.brand.isNotEmpty)
                       Text(
                         product.brand.toUpperCase(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: _mutedForeground,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
+                          letterSpacing: 0,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -870,7 +872,7 @@ class _CategoryProductsScreenState
                     Expanded(
                       child: Text(
                         product.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: _cardForeground,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -891,7 +893,7 @@ class _CategoryProductsScreenState
                         const SizedBox(width: 4),
                         Text(
                           product.rating.toStringAsFixed(1),
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: _foreground,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -901,7 +903,7 @@ class _CategoryProductsScreenState
                           const SizedBox(width: 4),
                           Text(
                             '(${product.reviewCount})',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: _mutedForeground,
                               fontSize: 11,
                             ),
@@ -915,7 +917,7 @@ class _CategoryProductsScreenState
                       children: [
                         Text(
                           '\$${product.finalPrice.toStringAsFixed(2)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: _foreground,
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -925,7 +927,7 @@ class _CategoryProductsScreenState
                           const SizedBox(width: 6),
                           Text(
                             '\$${product.price.toStringAsFixed(2)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: _mutedForeground,
                               fontSize: 12,
                               decoration: TextDecoration.lineThrough,
@@ -954,7 +956,7 @@ class _CategoryProductsScreenState
         if (loadingProgress == null) return child;
         return Container(
           color: _muted,
-          child: const Center(
+          child: Center(
             child: SizedBox(
               width: 24,
               height: 24,
@@ -968,7 +970,7 @@ class _CategoryProductsScreenState
       },
       errorBuilder: (context, error, stackTrace) => Container(
         color: _muted,
-        child: const Icon(
+        child: Icon(
           Icons.image_not_supported_outlined,
           color: _mutedForeground,
           size: 32,

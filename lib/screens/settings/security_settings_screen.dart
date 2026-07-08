@@ -151,7 +151,7 @@ class _SecuritySettingsScreenState
         title.toUpperCase(),
         style: AppTypography.labelSmall.copyWith(
           color: AppColors.foregroundSecondary,
-          letterSpacing: 1.2,
+          letterSpacing: 0,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -455,7 +455,7 @@ class _SecuritySettingsScreenState
               cursorColor: AppColors.primary,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.foreground,
-                letterSpacing: 4,
+                letterSpacing: 0,
               ),
               decoration: InputDecoration(
                 labelText: 'Enter verification code',

@@ -245,7 +245,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: AppColors.foreground,
-                        letterSpacing: -0.5,
+                        letterSpacing: 0,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -614,7 +614,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.2,
+                                  letterSpacing: 0,
                                 ),
                               ),
                       ),
